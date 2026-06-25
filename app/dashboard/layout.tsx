@@ -1,4 +1,12 @@
 import Link from "next/link";
+import {
+  BookOpen,
+  Download,
+  Heart,
+  Home,
+  Settings,
+  Sparkles,
+} from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -6,13 +14,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const navItems = [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Kindergarten", href: "/dashboard/kindergarten" },
-    { label: "First Grade", href: "/dashboard/first-grade" },
-    { label: "Second Grade", href: "/dashboard/second-grade" },
-    { label: "Favorites", href: "/dashboard/favorites" },
-    { label: "Downloads", href: "/dashboard/downloads" },
-    { label: "Account", href: "/dashboard/account" },
+    { label: "Dashboard", href: "/dashboard", icon: Home },
+    { label: "Kindergarten", href: "/dashboard/kindergarten", icon: Sparkles },
+    { label: "First Grade", href: "/dashboard/first-grade", icon: BookOpen },
+    { label: "Second Grade", href: "/dashboard/second-grade", icon: BookOpen },
+    { label: "Favorites", href: "/dashboard/favorites", icon: Heart },
+    { label: "Downloads", href: "/dashboard/downloads", icon: Download },
+    { label: "Account", href: "/dashboard/account", icon: Settings },
   ];
 
   return (
@@ -23,15 +31,20 @@ export default function DashboardLayout({
         </Link>
 
         <nav className="mt-10 space-y-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="block rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-slate-100"
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-slate-100"
+              >
+                <Icon size={20} />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
       </aside>
 
