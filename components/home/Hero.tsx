@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import ClassroomIllustration from "./ClassroomIllustration";
 
 export default function Hero() {
   return (
     <section className="relative overflow-hidden px-6 pb-24 pt-20">
-      <div className="absolute left-1/2 top-20 -z-10 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-amber-200/30 blur-3xl" />
+  <div className="absolute left-1/2 top-20 -z-10 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-amber-200/30 blur-3xl" />
 
-      <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
+  <ClassroomIllustration />
+
+  <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white/70 px-4 py-2 text-sm font-bold text-amber-800 shadow-sm backdrop-blur">
             <Sparkles size={16} />
