@@ -41,3 +41,26 @@ body {
   background: var(--brand-gold);
   color: var(--brand-navy);
 }
+
+.admin-input {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgb(226 232 240);
+  background: white;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  color: #1f2a44;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-input::placeholder {
+  color: rgb(148 163 184);
+}
+
+.admin-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14);
+}
