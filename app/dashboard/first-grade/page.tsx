@@ -1,114 +1,81 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { resources } from "@/lib/resources";
 import ResourceCard from "@/components/resources/ResourceCard";
 
-const subjects = ["All", "ELA", "Math", "Science", "Social Studies"];
-const weeks = ["All", 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-export default function FirstGradePage() {
-  const [selectedSubject, setSelectedSubject] = useState("All");
-  const [selectedWeek, setSelectedWeek] = useState<string | number>("All");
-  const [search, setSearch] = useState("");
-
-  const filteredResources = useMemo(() => {
-    return resources.filter((resource) => {
-      const matchesGrade = resource.grade === "First Grade";
-      const matchesSubject =
-        selectedSubject === "All" || resource.subject === selectedSubject;
-      const matchesWeek = selectedWeek === "All" || resource.week === selectedWeek;
-      const matchesSearch =
-        resource.title.toLowerCase().includes(search.toLowerCase()) ||
-        resource.description.toLowerCase().includes(search.toLowerCase()) ||
-        resource.standard.toLowerCase().includes(search.toLowerCase());
-
-      return matchesGrade && matchesSubject && matchesWeek && matchesSearch;
-    });
-  }, [selectedSubject, selectedWeek, search]);
+export default function DashboardPage() {
+  const featuredResources = resources.filter((resource) => resource.featured);
+  const recentResources = resources.slice(0, 3);
 
   return (
-    <main className="min-h-screen bg-slate-50 p-10">
-      <a href="/dashboard" className="text-blue-600 hover:underline">
-        ← Back to Dashboard
-      </a>
+    <>
+      <section>
+        <p className="font-semibold uppercase tracking-widest text-blue-600">
+          Teacher Dashboard
+        </p>
 
-      <div className="mt-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900">First Grade</h1>
-          <p className="mt-3 text-lg text-slate-600">
-            Browse resources by subject, week, standard, and skill.
-          </p>
+        <h1 className="mt-3 text-4xl font-bold text-slate-900">
+          Welcome back 👋
+        </h1>
+
+        <p className="mt-3 text-lg text-slate-600">
+          Find lesson plans, centers, assessments, and classroom resources fast.
+        </p>
+
+        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <input
+            placeholder="Search everything..."
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+          />
         </div>
+      </section>
 
-        <div className="rounded-xl bg-white px-4 py-3 font-semibold text-slate-700 shadow-sm">
-          {filteredResources.length} resources
-        </div>
-      </div>
+      <section className="mt-10">
+        <h2 className="text-2xl font-bold text-slate-900">
+          Featured This Week
+        </h2>
 
-      <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <input
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search by skill, title, or standard..."
-          className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
-        />
-
-        <div className="mt-6">
-          <p className="mb-3 font-semibold text-slate-900">Subject</p>
-          <div className="flex flex-wrap gap-3">
-            {subjects.map((subject) => (
-              <button
-                key={subject}
-                onClick={() => setSelectedSubject(subject)}
-                className={`rounded-full px-5 py-2 font-medium ${
-                  selectedSubject === subject
-                    ? "bg-blue-600 text-white"
-                    : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                {subject}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <p className="mb-3 font-semibold text-slate-900">Week</p>
-          <div className="flex flex-wrap gap-3">
-            {weeks.map((week) => (
-              <button
-                key={week}
-                onClick={() => setSelectedWeek(week)}
-                className={`rounded-full px-5 py-2 font-medium ${
-                  selectedWeek === week
-                    ? "bg-slate-900 text-white"
-                    : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                {week === "All" ? "All Weeks" : `Week ${week}`}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
-        {filteredResources.length > 0 ? (
-          filteredResources.map((resource) => (
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
+          {featuredResources.map((resource) => (
             <ResourceCard key={resource.id} resource={resource} />
-          ))
-        ) : (
-          <div className="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
-            <h2 className="text-2xl font-bold text-slate-900">
-              No resources found
-            </h2>
-            <p className="mt-3 text-slate-600">
-              Try changing the subject, week, or search term.
-            </p>
-          </div>
-        )}
-      </div>
-    </main>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-12">
+        <h2 className="text-2xl font-bold text-slate-900">Browse by Grade</h2>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
+          {[
+            { name: "Kindergarten", href: "/dashboard/kindergarten" },
+            { name: "First Grade", href: "/dashboard/first-grade" },
+            { name: "Second Grade", href: "/dashboard/second-grade" },
+          ].map((grade) => (
+            <Link
+              key={grade.name}
+              href={grade.href}
+              className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            >
+              <h3 className="text-2xl font-bold text-slate-900">
+                {grade.name}
+              </h3>
+
+              <p className="mt-3 text-slate-600">
+                Browse lessons, centers, activities, and assessments.
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-12">
+        <h2 className="text-2xl font-bold text-slate-900">Recently Added</h2>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
+          {recentResources.map((resource) => (
+            <ResourceCard key={resource.id} resource={resource} />
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
