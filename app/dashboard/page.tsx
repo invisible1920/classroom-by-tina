@@ -1,47 +1,117 @@
+import { BookOpen, Download, Star, Users } from "lucide-react";
+
+import ContinueTeachingCard from "@/components/dashboard/ContinueTeachingCard";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import GradeCard from "@/components/dashboard/GradeCard";
+import StatsCard from "@/components/dashboard/StatsCard";
+import ResourceCard from "@/components/resources/ResourceCard";
+import SectionTitle from "@/components/ui/SectionTitle";
+import { resources } from "@/lib/resources";
+
+const gradeLinks = [
+  {
+    name: "Kindergarten",
+    href: "/dashboard/kindergarten",
+    description: "Foundational literacy, number sense, centers, and routines.",
+  },
+  {
+    name: "First Grade",
+    href: "/dashboard/first-grade",
+    description: "Weekly ELA, math, science, and social studies resources.",
+  },
+  {
+    name: "Second Grade",
+    href: "/dashboard/second-grade",
+    description: "Structured lessons, assessments, activities, and review.",
+  },
+];
+
 export default function DashboardPage() {
+  const featuredResources = resources.filter((resource) => resource.featured);
+  const recentResources = resources.slice(0, 3);
+
   return (
-    <main className="min-h-screen bg-slate-50">
-      <aside className="fixed left-0 top-0 h-screen w-72 border-r border-slate-200 bg-white p-6">
-        <h1 className="text-2xl font-bold text-slate-900">
-          Classroom by Tina
-        </h1>
+    <>
+      <DashboardHeader />
 
-        <nav className="mt-10 space-y-2">
-          {["Dashboard", "Kindergarten", "First Grade", "Second Grade", "Favorites", "Downloads", "Account"].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="block rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-slate-100"
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-      </aside>
+      <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <StatsCard
+          title="Resources"
+          value="245"
+          subtitle="Across K–2"
+          icon={<BookOpen size={24} />}
+        />
 
-      <section className="ml-72 p-10">
-        <h2 className="text-4xl font-bold text-slate-900">
-          Teacher Dashboard
-        </h2>
+        <StatsCard
+          title="Featured"
+          value="12"
+          subtitle="This week"
+          icon={<Star size={24} />}
+        />
 
-        <p className="mt-3 text-lg text-slate-600">
-          Browse resources by grade, subject, week, and skill.
-        </p>
+        <StatsCard
+          title="Downloads"
+          value="3,422"
+          subtitle="Teacher downloads"
+          icon={<Download size={24} />}
+        />
 
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {["Kindergarten", "First Grade", "Second Grade"].map((grade) => (
-            <div
-              key={grade}
-              className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
-            >
-              <h3 className="text-2xl font-bold text-slate-900">{grade}</h3>
-              <p className="mt-3 text-slate-600">
-                Lesson plans, centers, assessments, and activities.
-              </p>
-            </div>
+        <StatsCard
+          title="Teachers"
+          value="218"
+          subtitle="Founding members"
+          icon={<Users size={24} />}
+        />
+      </section>
+
+      <ContinueTeachingCard />
+
+      <section className="mt-12">
+        <SectionTitle
+          eyebrow="Teaching Library"
+          title="Browse by Grade"
+          description="Start with the grade level, then move into subject, week, and resource type."
+        />
+
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
+          {gradeLinks.map((grade) => (
+            <GradeCard
+              key={grade.name}
+              name={grade.name}
+              href={grade.href}
+              description={grade.description}
+            />
           ))}
         </div>
       </section>
-    </main>
+
+      <section className="mt-12">
+        <SectionTitle
+          eyebrow="This Week"
+          title="Featured Resources"
+          description="High-priority resources Tina wants teachers to see first."
+        />
+
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
+          {featuredResources.map((resource) => (
+            <ResourceCard key={resource.id} resource={resource} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-12">
+        <SectionTitle
+          eyebrow="Recently Added"
+          title="New Teaching Materials"
+          description="Freshly added resources for planning, centers, and classroom instruction."
+        />
+
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
+          {recentResources.map((resource) => (
+            <ResourceCard key={resource.id} resource={resource} />
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
