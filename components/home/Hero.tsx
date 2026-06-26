@@ -24,7 +24,7 @@ export default function Hero() {
             Save hours every week.
           </h1>
 
-          <p className="mt-7 max-w-2xl text-lg sm:text-lg leading-8 text-slate-600 sm:text-xl">
+          <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
             Classroom by Tina gives K–2 teachers organized lesson plans,
             centers, assessments, homework, parent letters, classroom
             activities, and soon AI-powered teaching tools.
