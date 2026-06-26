@@ -25,6 +25,7 @@ export interface Resource {
   week: number;
   standard: string;
   category: ResourceCategory;
+  ability_group: AbilityGroup;
   thumbnail: string;
   pdf: string;
   featured: boolean;
@@ -33,11 +34,20 @@ export interface Resource {
   updatedAt: string;
 }
 
-export type CreateResourceInput = Omit<
-  Resource,
-  "id" | "slug" | "createdAt" | "updatedAt"
-> & {
+export type CreateResourceInput = {
   slug?: string;
+  title: string;
+  description: string;
+  grade: Grade;
+  subject: Subject;
+  week: number;
+  standard: string;
+  category: ResourceCategory;
+  ability_group: AbilityGroup;
+  thumbnail: string;
+  pdf: string;
+  featured: boolean;
+  status: ResourceStatus;
 };
 
 export type UpdateResourceInput = Partial<CreateResourceInput>;
