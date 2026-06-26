@@ -1,9 +1,11 @@
 import { revalidatePath } from "next/cache";
 import { RotateCcw } from "lucide-react";
 import { restoreResource } from "@/services";
+import { requireAdmin } from "@/lib/require-admin";
 
 async function restoreResourceAction(formData: FormData) {
   "use server";
+  await requireAdmin();
 
   const id = String(formData.get("id") ?? "");
 

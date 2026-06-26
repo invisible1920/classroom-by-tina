@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LogoutButton from "@/components/admin/LogoutButton";
 import {
   BarChart3,
   FileText,
@@ -63,12 +64,16 @@ export default function AdminLayout({
             </div>
           </Link>
 
-          <Link
-            href="/dashboard"
-            className="rounded-full bg-white px-5 py-2.5 text-sm font-black text-[#1f2a44] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f5b942]"
-          >
-            Teacher Dashboard
-          </Link>
+          <div className="flex items-center gap-3">
+  <Link
+    href="/dashboard"
+    className="rounded-full bg-white px-5 py-2.5 text-sm font-black text-[#1f2a44] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f5b942]"
+  >
+    Teacher Dashboard
+  </Link>
+
+  <LogoutButton />
+</div>
         </div>
 
         <nav className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-6 pb-4">

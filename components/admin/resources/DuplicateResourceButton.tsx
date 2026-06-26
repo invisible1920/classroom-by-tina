@@ -1,9 +1,11 @@
 import { revalidatePath } from "next/cache";
 import { Copy } from "lucide-react";
 import { duplicateResource } from "@/services";
+import { requireAdmin } from "@/lib/require-admin";
 
 async function duplicateResourceAction(formData: FormData) {
   "use server";
+  await requireAdmin();
 
   const id = String(formData.get("id") ?? "");
 

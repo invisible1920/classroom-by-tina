@@ -1,22 +1,39 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
 export default function FinalCTA() {
   return (
-    <section className="bg-white px-6 py-24 text-center">
-      <div className="mx-auto max-w-3xl">
-        <h2 className="text-4xl font-bold text-slate-900">
-          Stop rebuilding your week from scratch.
+    <section className="relative overflow-hidden px-6 py-28">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#1f2a44] via-[#24365d] to-[#1f2a44]" />
+
+      <div className="absolute left-1/2 top-1/2 -z-10 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#f5b942]/15 blur-3xl" />
+
+      <div className="mx-auto max-w-4xl text-center text-white">
+        <h2 className="text-5xl font-black leading-tight md:text-6xl">
+          Ready to simplify lesson planning?
         </h2>
 
-        <p className="mt-6 text-lg text-slate-600">
-          Classroom by Tina is being built for real lower-grade teachers who
-          need practical, organized, ready-to-use resources.
+        <p className="mx-auto mt-8 max-w-3xl text-xl leading-9 text-white/80">
+          Create your account to access organized K–2 teaching resources,
+          lesson plans, assessments, classroom activities, and more.
         </p>
 
-        <a
-          href="#pricing"
-          className="mt-8 inline-block rounded-xl bg-blue-600 px-8 py-4 font-semibold text-white hover:bg-blue-700"
-        >
-          Join the Founding Teacher List
-        </a>
+        <div className="mt-12 flex flex-col justify-center gap-4 sm:flex-row">
+          <Link
+            href="/signup"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-5 font-black text-[#1f2a44] transition hover:-translate-y-1 hover:bg-[#f5b942]"
+          >
+            Create Account
+            <ArrowRight size={18} />
+          </Link>
+
+          <Link
+            href="/login"
+            className="inline-flex items-center justify-center rounded-full border border-white/20 px-8 py-5 font-black text-white transition hover:bg-white/10"
+          >
+            Sign In
+          </Link>
+        </div>
       </div>
     </section>
   );

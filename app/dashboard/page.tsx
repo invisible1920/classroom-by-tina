@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { BookOpen, Download, Star, Users } from "lucide-react";
 
 import ContinueTeachingCard from "@/components/dashboard/ContinueTeachingCard";
@@ -7,6 +8,7 @@ import StatsCard from "@/components/dashboard/StatsCard";
 import ResourceCard from "@/components/resources/ResourceCard";
 import SectionTitle from "@/components/ui/SectionTitle";
 import { getResources } from "@/services";
+import { createClient } from "@/utils/supabase/server";
 
 const gradeLinks = [
   {
@@ -27,11 +29,36 @@ const gradeLinks = [
 ];
 
 export default async function DashboardPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, subscription_status")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile) {
+    redirect("/signup");
+  }
+
+  if (profile.role !== "admin" && profile.subscription_status !== "pro") {
+    redirect("/subscribe");
+  }
+
   const featuredResources = await getResources({
     featured: true,
     status: "published",
     pageSize: 3,
   });
+
   const recentResources = await getResources({
     status: "published",
     sortBy: "updatedAt",

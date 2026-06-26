@@ -1,21 +1,16 @@
 import Link from "next/link";
 import {
   ArrowLeft,
-  Copy,
-  Edit3,
-  Eye,
   FilePlus2,
-  FileText,
   Search,
-  Star,
 } from "lucide-react";
 
-import Card from "@/components/ui/Card";
-import ArchiveResourceButton from "@/components/admin/resources/ArchiveResourceButton";
+
+
 import { getResources } from "@/services";
+import Card from "@/components/ui/Card";
 import type { Grade, ResourceCategory, Subject } from "@/types/resource";
-import DuplicateResourceButton from "@/components/admin/resources/DuplicateResourceButton";
-import RestoreResourceButton from "@/components/admin/resources/RestoreResourceButton";
+import ResourceCard from "@/components/admin/resources/ResourceCard";
 
 const grades = ["All Grades", "Kindergarten", "First Grade", "Second Grade"];
 const subjects = ["All Subjects", "ELA", "Math", "Science", "Social Studies"];
@@ -154,97 +149,14 @@ export default async function AdminResourcesPage({
             </button>
           </form>
         </section>
-
-        <section className="mt-8 grid gap-5">
-          {resources.items.map((resource) => (
-            <Card
-  key={resource.id}
-  className={`p-0 ${
-    resource.status === "archived"
-      ? "border-rose-200 bg-rose-50/40 opacity-70"
-      : ""
-  }`}
->
-              <div className="grid gap-0 lg:grid-cols-[1fr_auto]">
-                <div className="p-6">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#3b82f6]/10 text-[#3b82f6]">
-                      <FileText size={22} />
-                    </div>
-
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h2
-  className={`text-xl font-black ${
-    resource.status === "archived"
-      ? "text-slate-400 line-through"
-      : "text-[#1f2a44]"
-  }`}
->
-  {resource.title}
-</h2>
-
-                        {resource.featured && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-[#f5b942]/20 px-3 py-1 text-xs font-black text-[#92400e]">
-                            <Star size={13} />
-                            Featured
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="mt-1 font-semibold text-slate-500">
-                        {resource.grade} · {resource.subject} · Week {resource.week}
-                      </p>
-                    </div>
-                  </div>
-
-                  <p className="mt-5 max-w-3xl leading-7 text-slate-600">
-                    {resource.description}
-                  </p>
-
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    <MetaBadge>{resource.category}</MetaBadge>
-                    <MetaBadge>{resource.standard}</MetaBadge>
-                    {resource.status === "archived" ? (
-  <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black uppercase text-rose-700">
-    Archived
-  </span>
-) : (
-  <MetaBadge>{resource.status}</MetaBadge>
-)}
-                    <MetaBadge>{resource.pdf ? "PDF attached" : "No PDF"}</MetaBadge>
-                    <MetaBadge>
-                      {resource.thumbnail ? "Thumbnail ready" : "No thumbnail"}
-                    </MetaBadge>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 border-t border-slate-100 p-6 lg:border-l lg:border-t-0">
-                  <Link
-                    href={`/dashboard/resources/${resource.id}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-black text-[#1f2a44] transition hover:-translate-y-0.5 hover:bg-[#3b82f6]/10 hover:text-[#3b82f6]"
-                  >
-                    <Eye size={17} />
-                    <span className="hidden xl:inline">Preview</span>
-                  </Link>
-                  <Link
-                    href={`/admin/resources/${resource.id}/edit`}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-black text-[#1f2a44] transition hover:-translate-y-0.5 hover:bg-[#3b82f6]/10 hover:text-[#3b82f6]"
-                  >
-                    <Edit3 size={17} />
-                    <span className="hidden xl:inline">Edit</span>
-                  </Link>
-                  <DuplicateResourceButton id={resource.id} />
-                  {resource.status === "archived" ? (
-  <RestoreResourceButton id={resource.id} />
-) : (
-  <ArchiveResourceButton id={resource.id} />
-)}
-                </div>
-              </div>
-            </Card>
-          ))}
-        </section>
+        <section className="mt-8 grid gap-6">
+  {resources.items.map((resource) => (
+    <ResourceCard
+      key={resource.id}
+      resource={resource}
+    />
+  ))}
+</section>
 
         <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm md:flex-row">
           <p className="font-black text-slate-600">
@@ -362,34 +274,4 @@ function AdminResourceStat({
   );
 }
 
-function MetaBadge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black capitalize text-slate-600">
-      {children}
-    </span>
-  );
-}
 
-function ActionButton({
-  icon,
-  label,
-  destructive = false,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  destructive?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-black transition hover:-translate-y-0.5 ${
-        destructive
-          ? "bg-rose-50 text-rose-600 hover:bg-rose-100"
-          : "bg-slate-100 text-[#1f2a44] hover:bg-[#3b82f6]/10 hover:text-[#3b82f6]"
-      }`}
-    >
-      {icon}
-      <span className="hidden xl:inline">{label}</span>
-    </button>
-  );
-}

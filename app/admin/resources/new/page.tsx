@@ -10,9 +10,10 @@ import {
   Sparkles,
   UploadCloud,
 } from "lucide-react";
+
 import { createResource } from "@/services";
-import type { Grade, ResourceCategory, Subject } from "@/types/resource";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import type { Grade, ResourceCategory, Subject } from "@/types/resource";
 
 const grades: Grade[] = ["Kindergarten", "First Grade", "Second Grade"];
 
@@ -43,34 +44,21 @@ async function createResourceAction(formData: FormData) {
   const featured = formData.get("featured") === "on";
 
   const pdfFile = formData.get("pdf") as File | null;
+  const thumbnailFile = formData.get("thumbnail") as File | null;
 
-let pdfPath = "/resources/sample.pdf";
-
-if (pdfFile && pdfFile.size > 0) {
-  const fileExtension = pdfFile.name.split(".").pop() ?? "pdf";
-  const fileName = `${crypto.randomUUID()}.${fileExtension}`;
-  const storagePath = `pdfs/${fileName}`;
-
-  const { error } = await supabaseAdmin.storage
-    .from("resources")
-    .upload(storagePath, pdfFile, {
-      contentType: pdfFile.type,
-      upsert: false,
-    });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const { data } = supabaseAdmin.storage
-    .from("resources")
-    .getPublicUrl(storagePath);
-
-  pdfPath = data.publicUrl;
-}
+  let pdfPath = "/resources/sample.pdf";
+  let thumbnailPath = "/images/resource-placeholder.png";
 
   if (!title) {
     throw new Error("Title is required.");
+  }
+
+  if (pdfFile && pdfFile.size > 0) {
+    pdfPath = await uploadResourceFile(pdfFile, "pdfs");
+  }
+
+  if (thumbnailFile && thumbnailFile.size > 0) {
+    thumbnailPath = await uploadResourceFile(thumbnailFile, "thumbnails");
   }
 
   await createResource({
@@ -83,17 +71,40 @@ if (pdfFile && pdfFile.size > 0) {
     category,
     featured,
     status: "published",
-    thumbnail: "/images/resource-placeholder.png",
+    thumbnail: thumbnailPath,
     pdf: pdfPath,
   });
 
   revalidatePath("/admin/resources");
   revalidatePath("/dashboard");
-  revalidatePath("/kindergarten");
-  revalidatePath("/first-grade");
-  revalidatePath("/second-grade");
+  revalidatePath("/dashboard/kindergarten");
+  revalidatePath("/dashboard/first-grade");
+  revalidatePath("/dashboard/second-grade");
 
   redirect("/admin/resources");
+}
+
+async function uploadResourceFile(file: File, folder: string) {
+  const extension = file.name.split(".").pop() ?? "file";
+  const fileName = `${crypto.randomUUID()}.${extension}`;
+  const storagePath = `${folder}/${fileName}`;
+
+  const { error } = await supabaseAdmin.storage
+    .from("resources")
+    .upload(storagePath, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const { data } = supabaseAdmin.storage
+    .from("resources")
+    .getPublicUrl(storagePath);
+
+  return data.publicUrl;
 }
 
 export default function NewResourcePage() {
@@ -124,15 +135,15 @@ export default function NewResourcePage() {
               </h1>
 
               <p className="mt-4 max-w-2xl text-lg leading-8 text-white/70">
-                Create a live resource in Supabase. File uploads are still using
-                placeholders until storage is connected.
+                Create a live resource with PDF and thumbnail uploads stored in
+                Supabase.
               </p>
             </div>
           </div>
         </section>
 
         <form
-  action={createResourceAction}
+          action={createResourceAction}
           className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]"
         >
           <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
@@ -221,16 +232,19 @@ export default function NewResourcePage() {
 
               <div className="mt-5 grid gap-4">
                 <FileUploadField
-  name="pdf"
-  icon={<UploadCloud size={24} />}
-  title="Upload PDF"
-  description="Upload a lesson plan, packet, slides, or printable PDF."
-/>
+                  name="pdf"
+                  accept="application/pdf"
+                  icon={<UploadCloud size={24} />}
+                  title="Upload PDF"
+                  description="Upload a lesson plan, packet, slides, or printable PDF."
+                />
 
-                <UploadBox
+                <FileUploadField
+                  name="thumbnail"
+                  accept="image/*"
                   icon={<Image size={24} />}
                   title="Upload Thumbnail"
-                  description="Storage upload coming next. Placeholder image is used for now."
+                  description="Upload a preview image for the resource card."
                 />
               </div>
             </section>
@@ -304,11 +318,13 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 function FileUploadField({
   name,
+  accept,
   icon,
   title,
   description,
 }: {
   name: string;
+  accept: string;
   icon: ReactNode;
   title: string;
   description: string;
@@ -331,32 +347,7 @@ function FileUploadField({
         </div>
       </div>
 
-      <input name={name} type="file" accept="application/pdf" className="sr-only" />
+      <input name={name} type="file" accept={accept} className="sr-only" />
     </label>
-  );
-}
-
-function UploadBox({
-  icon,
-  title,
-  description,
-}: {
-  icon: ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="flex w-full items-start gap-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-5 text-left">
-      <div className="rounded-2xl bg-white p-3 text-[#3b82f6] shadow-sm">
-        {icon}
-      </div>
-
-      <div>
-        <p className="font-black text-[#1f2a44]">{title}</p>
-        <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">
-          {description}
-        </p>
-      </div>
-    </div>
   );
 }

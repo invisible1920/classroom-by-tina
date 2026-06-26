@@ -1,9 +1,11 @@
 import { revalidatePath } from "next/cache";
 import { Trash2 } from "lucide-react";
 import { archiveResource } from "@/services";
+import { requireAdmin } from "@/lib/require-admin";
 
 async function archiveResourceAction(formData: FormData) {
   "use server";
+  archiveResourceAction
 
   const id = String(formData.get("id") ?? "");
 

@@ -293,26 +293,77 @@ export default async function EditResourcePage({
 
           <aside className="grid gap-6">
             <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-black text-[#1f2a44]">Files</h2>
+  <h2 className="text-xl font-black text-[#1f2a44]">Files</h2>
 
-              <div className="mt-5 grid gap-4">
-                <FileUploadField
-                  name="pdf"
-                  accept="application/pdf"
-                  icon={<UploadCloud size={24} />}
-                  title="Replace PDF"
-                  description={resource.pdf || "No PDF attached yet."}
-                />
+  <div className="mt-5 space-y-6">
 
-                <FileUploadField
-                  name="thumbnail"
-                  accept="image/*"
-                  icon={<Image size={24} />}
-                  title="Replace Thumbnail"
-                  description={resource.thumbnail || "No thumbnail attached yet."}
-                />
-              </div>
-            </section>
+    {resource.thumbnail && (
+      <div className="overflow-hidden rounded-2xl border border-slate-200">
+        <img
+          src={resource.thumbnail}
+          alt={resource.title}
+          className="h-44 w-full object-cover"
+        />
+      </div>
+    )}
+
+    <div className="rounded-2xl bg-slate-50 p-4">
+
+      <div className="flex items-center justify-between">
+
+        <div>
+
+          <p className="font-black text-[#1f2a44]">
+            PDF
+          </p>
+
+          <p className="text-sm text-slate-500">
+            {resource.pdf ? "PDF uploaded" : "No PDF uploaded"}
+          </p>
+
+        </div>
+
+        {resource.pdf && (
+          <a
+            href={resource.pdf}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-full bg-[#3b82f6]/10 px-4 py-2 text-sm font-black text-[#3b82f6] transition hover:bg-[#3b82f6] hover:text-white"
+          >
+            View PDF
+          </a>
+        )}
+
+      </div>
+
+      <div className="mt-4">
+
+        <FileUploadField
+          name="pdf"
+          accept="application/pdf"
+          icon={<UploadCloud size={24} />}
+          title="Replace PDF"
+          description="Upload a new PDF"
+        />
+
+      </div>
+
+    </div>
+
+    <div className="rounded-2xl bg-slate-50 p-4">
+
+      <FileUploadField
+        name="thumbnail"
+        accept="image/*"
+        icon={<Image size={24} />}
+        title="Replace Thumbnail"
+        description="Upload a new thumbnail"
+      />
+
+    </div>
+
+  </div>
+</section>
 
             <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-black text-[#1f2a44]">Publish</h2>
