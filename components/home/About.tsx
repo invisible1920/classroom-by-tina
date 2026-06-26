@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   Award,
   BookOpen,
@@ -40,29 +41,31 @@ export default function About() {
             <div className="p-8">
               <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black text-[#1f2a44] shadow-sm">
                 <Sparkles size={16} className="text-[#f5b942]" />
-                Built by Tina
+                Meet Tina
               </div>
 
               <div className="mt-8 flex items-center gap-5">
-                <div className="flex h-24 w-24 items-center justify-center rounded-[2rem] bg-[#1f2a44] text-4xl font-black text-white shadow-xl">
-                  T
-                </div>
+                <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full border-4 border-white bg-white shadow-xl">
+  <Image
+  src="/tina.jpg"
+  alt="Tina"
+  fill
+  className="object-cover"
+/>
+</div>
 
                 <div>
                   <h3 className="text-3xl font-black tracking-tight text-[#1f2a44]">
-                    Classroom-tested resources.
+                    10 Years Teaching First Grade
                   </h3>
                   <p className="mt-2 font-bold text-slate-600">
-                    Designed from real K–2 teaching experience.
+                    Charlotte-Mecklenburg Schools
                   </p>
                 </div>
               </div>
 
               <p className="mt-8 text-lg leading-8 text-slate-700">
-                Tina spent 10 years as a First Grade teacher in
-                Charlotte-Mecklenburg Schools, creating practical resources that
-                helped teachers plan faster, stay organized, and teach with
-                confidence.
+                For 10 years, Tina taught First Grade in Charlotte-Mecklenburg Schools, creating engaging lesson plans, centers, assessments, and classroom routines that helped students succeed. Classroom by Tina brings those classroom-tested resources together in one organized platform so teachers can spend less time planning and more time teaching.
               </p>
 
               <div className="mt-8 grid gap-4">
@@ -150,7 +153,7 @@ export default function About() {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 flex items-center gap-6">
             {["Plan faster", "Teach better", "Go home lighter"].map((item) => (
               <div
                 key={item}
