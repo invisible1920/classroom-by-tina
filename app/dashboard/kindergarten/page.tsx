@@ -1,7 +1,14 @@
-export default function KindergartenPage() {
+import GradeResourceBrowser from "@/components/resources/GradeResourceBrowser";
+import { getResources } from "@/services";
+
+export default async function KindergartenPage() {
+  const resources = await getResources({
+    grade: "Kindergarten",
+    status: "published",
+    pageSize: 100,
+  });
+
   return (
-    <h1 className="text-4xl font-bold text-slate-900">
-      Kindergarten
-    </h1>
+    <GradeResourceBrowser grade="Kindergarten" resources={resources.items} />
   );
 }

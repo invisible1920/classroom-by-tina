@@ -4,13 +4,18 @@ export type Subject = "ELA" | "Math" | "Science" | "Social Studies";
 
 export type ResourceCategory =
   | "Lesson Plan"
-  | "Center"
+  | "Centers"
   | "Assessment"
-  | "Worksheet"
-  | "Homework";
+  | "Homework"
+  | "Parent Letter"
+  | "Slides"
+  | "Activity";
+
+export type ResourceStatus = "draft" | "published" | "archived";
 
 export interface Resource {
   id: string;
+  slug: string;
   title: string;
   description: string;
   grade: Grade;
@@ -21,4 +26,16 @@ export interface Resource {
   thumbnail: string;
   pdf: string;
   featured: boolean;
+  status: ResourceStatus;
+  createdAt: string;
+  updatedAt: string;
 }
+
+export type CreateResourceInput = Omit<
+  Resource,
+  "id" | "slug" | "createdAt" | "updatedAt"
+> & {
+  slug?: string;
+};
+
+export type UpdateResourceInput = Partial<CreateResourceInput>;

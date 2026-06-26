@@ -1,5 +1,5 @@
-import { resources } from "@/lib/resources";
 import Link from "next/link";
+import { getResource } from "@/services";
 import { notFound } from "next/navigation";
 
 export default async function ResourceDetailPage({
@@ -9,7 +9,7 @@ export default async function ResourceDetailPage({
 }) {
   const { id } = await params;
 
-  const resource = resources.find((item) => item.id === id);
+  const resource = await getResource(id);
 
   if (!resource) {
     notFound();

@@ -1,3 +1,14 @@
-export default function SecondGradePage() {
-  return <h1 className="text-4xl font-bold text-slate-900">Second Grade</h1>;
+import GradeResourceBrowser from "@/components/resources/GradeResourceBrowser";
+import { getResources } from "@/services";
+
+export default async function SecondGradePage() {
+  const resources = await getResources({
+    grade: "Second Grade",
+    status: "published",
+    pageSize: 100,
+  });
+
+  return (
+    <GradeResourceBrowser grade="Second Grade" resources={resources.items} />
+  );
 }

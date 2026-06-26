@@ -11,7 +11,7 @@ import {
 
 import Card from "@/components/ui/Card";
 import SectionTitle from "@/components/ui/SectionTitle";
-import { resources } from "@/lib/resources";
+import { getResources } from "@/services";
 
 const adminActions = [
   {
@@ -52,12 +52,15 @@ const adminActions = [
   },
 ];
 
-export default function AdminPage() {
-  const totalResources = resources.length;
-  const featuredResources = resources.filter((resource) => resource.featured);
-  const firstGradeResources = resources.filter(
-    (resource) => resource.grade === "First Grade"
-  );
+export default async function AdminPage() {
+  const allResources = await getResources({ pageSize: 1 });
+  const featuredResources = await getResources({ featured: true, pageSize: 1 });
+  const firstGradeResources = await getResources({
+    grade: "First Grade",
+    pageSize: 1,
+  });
+
+  const totalResources = allResources.total;
 
   return (
     <main className="min-h-screen bg-[#fff8f0] px-6 py-10">
@@ -92,18 +95,18 @@ export default function AdminPage() {
           <AdminStatCard
             label="Total Resources"
             value={String(totalResources)}
-            detail="Currently in fake database"
+            detail="From resource service"
           />
 
           <AdminStatCard
             label="Featured"
-            value={String(featuredResources.length)}
+            value={String(featuredResources.total)}
             detail="Highlighted for teachers"
           />
 
           <AdminStatCard
             label="First Grade"
-            value={String(firstGradeResources.length)}
+            value={String(firstGradeResources.total)}
             detail="Resources ready for launch"
           />
         </section>
@@ -156,10 +159,7 @@ export default function AdminPage() {
               </h2>
 
               <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-                Next we’ll create <strong>/admin/resources/new</strong>, the
-                upload form where Tina can enter title, description, grade,
-                subject, week, standard, category, featured status, PDF URL, and
-                thumbnail URL.
+                The resource service layer is now the boundary between pages and data. Next we’ll make the CMS actions functional, then swap the fake database for Supabase without rewriting pages.
               </p>
             </div>
           </div>

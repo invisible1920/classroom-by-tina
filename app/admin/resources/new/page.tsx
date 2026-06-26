@@ -1,4 +1,7 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import {
   ArrowLeft,
   FilePlus2,
@@ -7,10 +10,15 @@ import {
   Sparkles,
   UploadCloud,
 } from "lucide-react";
+import { createResource } from "@/services";
+import type { Grade, ResourceCategory, Subject } from "@/types/resource";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
-const grades = ["Kindergarten", "First Grade", "Second Grade"];
-const subjects = ["ELA", "Math", "Science", "Social Studies"];
-const categories = [
+const grades: Grade[] = ["Kindergarten", "First Grade", "Second Grade"];
+
+const subjects: Subject[] = ["ELA", "Math", "Science", "Social Studies"];
+
+const categories: ResourceCategory[] = [
   "Lesson Plan",
   "Centers",
   "Assessment",
@@ -19,6 +27,74 @@ const categories = [
   "Slides",
   "Activity",
 ];
+
+async function createResourceAction(formData: FormData) {
+  "use server";
+
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const grade = String(formData.get("grade") ?? "First Grade") as Grade;
+  const subject = String(formData.get("subject") ?? "ELA") as Subject;
+  const week = Number(formData.get("week") ?? 1);
+  const standard = String(formData.get("standard") ?? "").trim();
+  const category = String(
+    formData.get("category") ?? "Lesson Plan"
+  ) as ResourceCategory;
+  const featured = formData.get("featured") === "on";
+
+  const pdfFile = formData.get("pdf") as File | null;
+
+let pdfPath = "/resources/sample.pdf";
+
+if (pdfFile && pdfFile.size > 0) {
+  const fileExtension = pdfFile.name.split(".").pop() ?? "pdf";
+  const fileName = `${crypto.randomUUID()}.${fileExtension}`;
+  const storagePath = `pdfs/${fileName}`;
+
+  const { error } = await supabaseAdmin.storage
+    .from("resources")
+    .upload(storagePath, pdfFile, {
+      contentType: pdfFile.type,
+      upsert: false,
+    });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const { data } = supabaseAdmin.storage
+    .from("resources")
+    .getPublicUrl(storagePath);
+
+  pdfPath = data.publicUrl;
+}
+
+  if (!title) {
+    throw new Error("Title is required.");
+  }
+
+  await createResource({
+    title,
+    description,
+    grade,
+    subject,
+    week: Number.isFinite(week) && week > 0 ? week : 1,
+    standard,
+    category,
+    featured,
+    status: "published",
+    thumbnail: "/images/resource-placeholder.png",
+    pdf: pdfPath,
+  });
+
+  revalidatePath("/admin/resources");
+  revalidatePath("/dashboard");
+  revalidatePath("/kindergarten");
+  revalidatePath("/first-grade");
+  revalidatePath("/second-grade");
+
+  redirect("/admin/resources");
+}
 
 export default function NewResourcePage() {
   return (
@@ -48,15 +124,17 @@ export default function NewResourcePage() {
               </h1>
 
               <p className="mt-4 max-w-2xl text-lg leading-8 text-white/70">
-                This is the first version of Tina’s upload workflow. For now,
-                this form is visual only. Next we’ll connect it to Supabase
-                storage and database tables.
+                Create a live resource in Supabase. File uploads are still using
+                placeholders until storage is connected.
               </p>
             </div>
           </div>
         </section>
 
-        <form className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
+        <form
+  action={createResourceAction}
+          className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]"
+        >
           <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
             <h2 className="text-2xl font-black text-[#1f2a44]">
               Resource Details
@@ -65,7 +143,9 @@ export default function NewResourcePage() {
             <div className="mt-6 grid gap-5">
               <Field label="Title">
                 <input
+                  name="title"
                   type="text"
+                  required
                   placeholder="Example: First Grade ELA Week 4 Lesson Plan"
                   className="admin-input"
                 />
@@ -73,6 +153,7 @@ export default function NewResourcePage() {
 
               <Field label="Description">
                 <textarea
+                  name="description"
                   placeholder="Briefly describe what this resource helps teachers do..."
                   rows={5}
                   className="admin-input resize-none"
@@ -81,17 +162,21 @@ export default function NewResourcePage() {
 
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Grade">
-                  <select className="admin-input">
+                  <select name="grade" className="admin-input">
                     {grades.map((grade) => (
-                      <option key={grade}>{grade}</option>
+                      <option key={grade} value={grade}>
+                        {grade}
+                      </option>
                     ))}
                   </select>
                 </Field>
 
                 <Field label="Subject">
-                  <select className="admin-input">
+                  <select name="subject" className="admin-input">
                     {subjects.map((subject) => (
-                      <option key={subject}>{subject}</option>
+                      <option key={subject} value={subject}>
+                        {subject}
+                      </option>
                     ))}
                   </select>
                 </Field>
@@ -100,15 +185,17 @@ export default function NewResourcePage() {
               <div className="grid gap-5 md:grid-cols-3">
                 <Field label="Week">
                   <input
+                    name="week"
                     type="number"
                     min="1"
-                    placeholder="4"
+                    defaultValue="1"
                     className="admin-input"
                   />
                 </Field>
 
                 <Field label="Standard">
                   <input
+                    name="standard"
                     type="text"
                     placeholder="RL.1.2"
                     className="admin-input"
@@ -116,9 +203,11 @@ export default function NewResourcePage() {
                 </Field>
 
                 <Field label="Category">
-                  <select className="admin-input">
+                  <select name="category" className="admin-input">
                     {categories.map((category) => (
-                      <option key={category}>{category}</option>
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
                   </select>
                 </Field>
@@ -131,16 +220,17 @@ export default function NewResourcePage() {
               <h2 className="text-xl font-black text-[#1f2a44]">Files</h2>
 
               <div className="mt-5 grid gap-4">
-                <UploadBox
-                  icon={<UploadCloud size={24} />}
-                  title="Upload PDF"
-                  description="Lesson plan, packet, slides, or printable file."
-                />
+                <FileUploadField
+  name="pdf"
+  icon={<UploadCloud size={24} />}
+  title="Upload PDF"
+  description="Upload a lesson plan, packet, slides, or printable PDF."
+/>
 
                 <UploadBox
                   icon={<Image size={24} />}
                   title="Upload Thumbnail"
-                  description="Preview image teachers will see on resource cards."
+                  description="Storage upload coming next. Placeholder image is used for now."
                 />
               </div>
             </section>
@@ -156,11 +246,15 @@ export default function NewResourcePage() {
                   </p>
                 </div>
 
-                <input type="checkbox" className="h-5 w-5 accent-[#3b82f6]" />
+                <input
+                  name="featured"
+                  type="checkbox"
+                  className="h-5 w-5 accent-[#3b82f6]"
+                />
               </label>
 
               <button
-                type="button"
+                type="submit"
                 className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1f2a44] px-6 py-4 font-black text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
               >
                 <Save size={18} />
@@ -168,7 +262,7 @@ export default function NewResourcePage() {
               </button>
 
               <p className="mt-4 text-center text-sm font-semibold text-slate-500">
-                Supabase saving coming next.
+                Saves directly to Supabase.
               </p>
             </section>
 
@@ -196,13 +290,7 @@ export default function NewResourcePage() {
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
       <span className="text-sm font-black uppercase tracking-widest text-slate-500">
@@ -214,20 +302,51 @@ function Field({
   );
 }
 
+function FileUploadField({
+  name,
+  icon,
+  title,
+  description,
+}: {
+  name: string;
+  icon: ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-5 transition hover:border-[#3b82f6] hover:bg-blue-50">
+      <div className="flex items-start gap-4">
+        <div className="rounded-2xl bg-white p-3 text-[#3b82f6] shadow-sm">
+          {icon}
+        </div>
+
+        <div>
+          <p className="font-black text-[#1f2a44]">{title}</p>
+          <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">
+            {description}
+          </p>
+          <p className="mt-3 text-xs font-black uppercase tracking-widest text-[#3b82f6]">
+            Choose file
+          </p>
+        </div>
+      </div>
+
+      <input name={name} type="file" accept="application/pdf" className="sr-only" />
+    </label>
+  );
+}
+
 function UploadBox({
   icon,
   title,
   description,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   description: string;
 }) {
   return (
-    <button
-      type="button"
-      className="flex w-full items-start gap-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-5 text-left transition hover:border-[#3b82f6] hover:bg-blue-50"
-    >
+    <div className="flex w-full items-start gap-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-5 text-left">
       <div className="rounded-2xl bg-white p-3 text-[#3b82f6] shadow-sm">
         {icon}
       </div>
@@ -238,6 +357,6 @@ function UploadBox({
           {description}
         </p>
       </div>
-    </button>
+    </div>
   );
 }

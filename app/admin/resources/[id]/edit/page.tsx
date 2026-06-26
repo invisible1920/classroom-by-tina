@@ -9,7 +9,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 
-import { resources } from "@/lib/resources";
+import { getResource } from "@/services";
 
 const grades = ["Kindergarten", "First Grade", "Second Grade"];
 const subjects = ["ELA", "Math", "Science", "Social Studies"];
@@ -33,7 +33,7 @@ export default async function EditResourcePage({
   params,
 }: EditResourcePageProps) {
   const { id } = await params;
-  const resource = resources.find((item) => item.id === id);
+  const resource = await getResource(id);
 
   if (!resource) {
     notFound();

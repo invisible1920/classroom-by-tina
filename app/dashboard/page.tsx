@@ -6,7 +6,7 @@ import GradeCard from "@/components/dashboard/GradeCard";
 import StatsCard from "@/components/dashboard/StatsCard";
 import ResourceCard from "@/components/resources/ResourceCard";
 import SectionTitle from "@/components/ui/SectionTitle";
-import { resources } from "@/lib/resources";
+import { getResources } from "@/services";
 
 const gradeLinks = [
   {
@@ -26,9 +26,18 @@ const gradeLinks = [
   },
 ];
 
-export default function DashboardPage() {
-  const featuredResources = resources.filter((resource) => resource.featured);
-  const recentResources = resources.slice(0, 3);
+export default async function DashboardPage() {
+  const featuredResources = await getResources({
+    featured: true,
+    status: "published",
+    pageSize: 3,
+  });
+  const recentResources = await getResources({
+    status: "published",
+    sortBy: "updatedAt",
+    sortOrder: "desc",
+    pageSize: 3,
+  });
 
   return (
     <>
@@ -93,7 +102,7 @@ export default function DashboardPage() {
         />
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
-          {featuredResources.map((resource) => (
+          {featuredResources.items.map((resource) => (
             <ResourceCard key={resource.id} resource={resource} />
           ))}
         </div>
@@ -107,7 +116,7 @@ export default function DashboardPage() {
         />
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
-          {recentResources.map((resource) => (
+          {recentResources.items.map((resource) => (
             <ResourceCard key={resource.id} resource={resource} />
           ))}
         </div>
