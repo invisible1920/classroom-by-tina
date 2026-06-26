@@ -56,6 +56,22 @@ export async function getResourcesFromSupabase(): Promise<Resource[]> {
   return (data ?? []).map(mapResource);
 }
 
+export async function getResourceFromSupabase(
+  id: string
+): Promise<Resource | null> {
+  const { data, error } = await supabaseAdmin
+    .from("resources")
+    .select("*")
+    .or(`id.eq.${id},slug.eq.${id}`)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ? mapResource(data) : null;
+}
+
 export async function createResourceInSupabase(
   input: CreateResourceInput
 ): Promise<Resource> {
@@ -113,4 +129,30 @@ export async function archiveResourceInSupabase(
     status: "archived",
     featured: false,
   });
+}
+
+export async function restoreResourceInSupabase(
+  id: string
+): Promise<Resource | null> {
+  return updateResourceInSupabase(id, {
+    status: "draft",
+  });
+}
+
+export async function permanentlyDeleteResourceInSupabase(
+  id: string
+): Promise<Resource | null> {
+  const existing = await getResourceFromSupabase(id);
+
+  if (!existing) {
+    return null;
+  }
+
+  const { error } = await supabaseAdmin.from("resources").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return existing;
 }

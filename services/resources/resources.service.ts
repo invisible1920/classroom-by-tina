@@ -160,7 +160,25 @@ export async function archiveResource(
 }
 
 export async function duplicateResource(id: string): Promise<Resource | null> {
-  throw new Error("duplicateResource is not connected to Supabase yet.");
+  const existing = await getResource(id);
+
+  if (!existing) {
+    return null;
+  }
+
+  return createResource({
+    title: `${existing.title} Copy`,
+    description: existing.description,
+    grade: existing.grade,
+    subject: existing.subject,
+    week: existing.week,
+    standard: existing.standard,
+    category: existing.category,
+    thumbnail: existing.thumbnail,
+    pdf: existing.pdf,
+    featured: false,
+    status: "draft",
+  });
 }
 
 export async function searchResources(

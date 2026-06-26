@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import {
   ArrowLeft,
   Eye,
@@ -9,11 +11,18 @@ import {
   UploadCloud,
 } from "lucide-react";
 
-import { getResource } from "@/services";
+import { getResource, updateResource } from "@/services";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import type {
+  Grade,
+  ResourceCategory,
+  ResourceStatus,
+  Subject,
+} from "@/types/resource";
 
-const grades = ["Kindergarten", "First Grade", "Second Grade"];
-const subjects = ["ELA", "Math", "Science", "Social Studies"];
-const categories = [
+const grades: Grade[] = ["Kindergarten", "First Grade", "Second Grade"];
+const subjects: Subject[] = ["ELA", "Math", "Science", "Social Studies"];
+const categories: ResourceCategory[] = [
   "Lesson Plan",
   "Centers",
   "Assessment",
@@ -23,11 +32,101 @@ const categories = [
   "Activity",
 ];
 
+const statuses: ResourceStatus[] = ["draft", "published", "archived"];
+
 type EditResourcePageProps = {
   params: Promise<{
     id: string;
   }>;
 };
+
+async function updateResourceAction(formData: FormData) {
+  "use server";
+
+  const id = String(formData.get("id") ?? "");
+  const currentPdf = String(formData.get("currentPdf") ?? "");
+  const currentThumbnail = String(formData.get("currentThumbnail") ?? "");
+
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const grade = String(formData.get("grade") ?? "First Grade") as Grade;
+  const subject = String(formData.get("subject") ?? "ELA") as Subject;
+  const week = Number(formData.get("week") ?? 1);
+  const standard = String(formData.get("standard") ?? "").trim();
+  const category = String(
+    formData.get("category") ?? "Lesson Plan"
+  ) as ResourceCategory;
+  const status = String(formData.get("status") ?? "draft") as ResourceStatus;
+  const featured = formData.get("featured") === "on";
+
+  const pdfFile = formData.get("pdf") as File | null;
+  const thumbnailFile = formData.get("thumbnail") as File | null;
+
+  let pdf = currentPdf;
+  let thumbnail = currentThumbnail;
+
+  if (!id) {
+    throw new Error("Missing resource id.");
+  }
+
+  if (!title) {
+    throw new Error("Title is required.");
+  }
+
+  if (pdfFile && pdfFile.size > 0) {
+    pdf = await uploadResourceFile(pdfFile, "pdfs");
+  }
+
+  if (thumbnailFile && thumbnailFile.size > 0) {
+    thumbnail = await uploadResourceFile(thumbnailFile, "thumbnails");
+  }
+
+  await updateResource(id, {
+    title,
+    description,
+    grade,
+    subject,
+    week: Number.isFinite(week) && week > 0 ? week : 1,
+    standard,
+    category,
+    featured,
+    status,
+    pdf,
+    thumbnail,
+  });
+
+  revalidatePath("/admin/resources");
+  revalidatePath(`/admin/resources/${id}/edit`);
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/kindergarten");
+  revalidatePath("/dashboard/first-grade");
+  revalidatePath("/dashboard/second-grade");
+
+  redirect("/admin/resources");
+}
+
+async function uploadResourceFile(file: File, folder: string) {
+  const extension = file.name.split(".").pop() ?? "file";
+  const fileName = `${crypto.randomUUID()}.${extension}`;
+  const storagePath = `${folder}/${fileName}`;
+
+  const { error } = await supabaseAdmin.storage
+    .from("resources")
+    .upload(storagePath, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const { data } = supabaseAdmin.storage
+    .from("resources")
+    .getPublicUrl(storagePath);
+
+  return data.publicUrl;
+}
 
 export default async function EditResourcePage({
   params,
@@ -77,7 +176,15 @@ export default async function EditResourcePage({
           </div>
         </section>
 
-        <form className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
+        <form action={updateResourceAction} className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
+          <input type="hidden" name="id" value={resource.id} />
+          <input type="hidden" name="currentPdf" value={resource.pdf} />
+          <input
+            type="hidden"
+            name="currentThumbnail"
+            value={resource.thumbnail}
+          />
+
           <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
             <h2 className="text-2xl font-black text-[#1f2a44]">
               Resource Details
@@ -86,14 +193,17 @@ export default async function EditResourcePage({
             <div className="mt-6 grid gap-5">
               <Field label="Title">
                 <input
+                  name="title"
                   type="text"
                   defaultValue={resource.title}
+                  required
                   className="admin-input"
                 />
               </Field>
 
               <Field label="Description">
                 <textarea
+                  name="description"
                   defaultValue={resource.description}
                   rows={5}
                   className="admin-input resize-none"
@@ -102,20 +212,29 @@ export default async function EditResourcePage({
 
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Grade">
-                  <select defaultValue={resource.grade} className="admin-input">
+                  <select
+                    name="grade"
+                    defaultValue={resource.grade}
+                    className="admin-input"
+                  >
                     {grades.map((grade) => (
-                      <option key={grade}>{grade}</option>
+                      <option key={grade} value={grade}>
+                        {grade}
+                      </option>
                     ))}
                   </select>
                 </Field>
 
                 <Field label="Subject">
                   <select
+                    name="subject"
                     defaultValue={resource.subject}
                     className="admin-input"
                   >
                     {subjects.map((subject) => (
-                      <option key={subject}>{subject}</option>
+                      <option key={subject} value={subject}>
+                        {subject}
+                      </option>
                     ))}
                   </select>
                 </Field>
@@ -124,6 +243,7 @@ export default async function EditResourcePage({
               <div className="grid gap-5 md:grid-cols-3">
                 <Field label="Week">
                   <input
+                    name="week"
                     type="number"
                     min="1"
                     defaultValue={resource.week}
@@ -133,6 +253,7 @@ export default async function EditResourcePage({
 
                 <Field label="Standard">
                   <input
+                    name="standard"
                     type="text"
                     defaultValue={resource.standard}
                     className="admin-input"
@@ -141,15 +262,32 @@ export default async function EditResourcePage({
 
                 <Field label="Category">
                   <select
+                    name="category"
                     defaultValue={resource.category}
                     className="admin-input"
                   >
                     {categories.map((category) => (
-                      <option key={category}>{category}</option>
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
                   </select>
                 </Field>
               </div>
+
+              <Field label="Status">
+                <select
+                  name="status"
+                  defaultValue={resource.status}
+                  className="admin-input"
+                >
+                  {statuses.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </Field>
             </div>
           </section>
 
@@ -158,13 +296,17 @@ export default async function EditResourcePage({
               <h2 className="text-xl font-black text-[#1f2a44]">Files</h2>
 
               <div className="mt-5 grid gap-4">
-                <UploadBox
+                <FileUploadField
+                  name="pdf"
+                  accept="application/pdf"
                   icon={<UploadCloud size={24} />}
                   title="Replace PDF"
                   description={resource.pdf || "No PDF attached yet."}
                 />
 
-                <UploadBox
+                <FileUploadField
+                  name="thumbnail"
+                  accept="image/*"
                   icon={<Image size={24} />}
                   title="Replace Thumbnail"
                   description={resource.thumbnail || "No thumbnail attached yet."}
@@ -184,6 +326,7 @@ export default async function EditResourcePage({
                 </div>
 
                 <input
+                  name="featured"
                   type="checkbox"
                   defaultChecked={resource.featured}
                   className="h-5 w-5 accent-[#3b82f6]"
@@ -191,7 +334,7 @@ export default async function EditResourcePage({
               </label>
 
               <button
-                type="button"
+                type="submit"
                 className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1f2a44] px-6 py-4 font-black text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
               >
                 <Save size={18} />
@@ -199,7 +342,7 @@ export default async function EditResourcePage({
               </button>
 
               <p className="mt-4 text-center text-sm font-semibold text-slate-500">
-                Supabase saving coming next.
+                Saves directly to Supabase.
               </p>
             </section>
 
@@ -226,13 +369,7 @@ export default async function EditResourcePage({
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
       <span className="text-sm font-black uppercase tracking-widest text-slate-500">
@@ -244,30 +381,38 @@ function Field({
   );
 }
 
-function UploadBox({
+function FileUploadField({
+  name,
+  accept,
   icon,
   title,
   description,
 }: {
-  icon: React.ReactNode;
+  name: string;
+  accept: string;
+  icon: ReactNode;
   title: string;
   description: string;
 }) {
   return (
-    <button
-      type="button"
-      className="flex w-full items-start gap-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-5 text-left transition hover:border-[#3b82f6] hover:bg-blue-50"
-    >
-      <div className="rounded-2xl bg-white p-3 text-[#3b82f6] shadow-sm">
-        {icon}
+    <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-5 transition hover:border-[#3b82f6] hover:bg-blue-50">
+      <div className="flex items-start gap-4">
+        <div className="rounded-2xl bg-white p-3 text-[#3b82f6] shadow-sm">
+          {icon}
+        </div>
+
+        <div>
+          <p className="font-black text-[#1f2a44]">{title}</p>
+          <p className="mt-1 break-all text-sm font-semibold leading-6 text-slate-500">
+            {description}
+          </p>
+          <p className="mt-3 text-xs font-black uppercase tracking-widest text-[#3b82f6]">
+            Choose file
+          </p>
+        </div>
       </div>
 
-      <div>
-        <p className="font-black text-[#1f2a44]">{title}</p>
-        <p className="mt-1 break-all text-sm font-semibold leading-6 text-slate-500">
-          {description}
-        </p>
-      </div>
-    </button>
+      <input name={name} type="file" accept={accept} className="sr-only" />
+    </label>
   );
 }

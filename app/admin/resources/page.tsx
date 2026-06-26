@@ -14,6 +14,7 @@ import Card from "@/components/ui/Card";
 import ArchiveResourceButton from "@/components/admin/resources/ArchiveResourceButton";
 import { getResources } from "@/services";
 import type { Grade, ResourceCategory, Subject } from "@/types/resource";
+import DuplicateResourceButton from "@/components/admin/resources/DuplicateResourceButton";
 
 const grades = ["All Grades", "Kindergarten", "First Grade", "Second Grade"];
 const subjects = ["All Subjects", "ELA", "Math", "Science", "Social Studies"];
@@ -232,7 +233,7 @@ export default async function AdminResourcesPage({
                     <Edit3 size={17} />
                     <span className="hidden xl:inline">Edit</span>
                   </Link>
-                  <ActionButton icon={<Copy size={17} />} label="Duplicate" />
+                  <DuplicateResourceButton id={resource.id} />
                   <ArchiveResourceButton id={resource.id} />
                 </div>
               </div>
