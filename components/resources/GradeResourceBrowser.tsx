@@ -7,6 +7,7 @@ import type { Grade, Resource } from "@/types/resource";
 
 const subjects = ["All", "ELA", "Math", "Science", "Social Studies"];
 const weeks = ["All", 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const abilityGroups = ["All", "Low", "Medium", "High"];
 
 type GradeResourceBrowserProps = {
   grade: Grade;
@@ -19,22 +20,45 @@ export default function GradeResourceBrowser({
 }: GradeResourceBrowserProps) {
   const [selectedSubject, setSelectedSubject] = useState("All");
   const [selectedWeek, setSelectedWeek] = useState<string | number>("All");
+  const [selectedAbilityGroup, setSelectedAbilityGroup] = useState("All");
   const [search, setSearch] = useState("");
 
   const filteredResources = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+
     return resources.filter((resource) => {
       const matchesSubject =
         selectedSubject === "All" || resource.subject === selectedSubject;
-      const matchesWeek = selectedWeek === "All" || resource.week === selectedWeek;
-      const normalizedSearch = search.toLowerCase();
-      const matchesSearch =
-        resource.title.toLowerCase().includes(normalizedSearch) ||
-        resource.description.toLowerCase().includes(normalizedSearch) ||
-        resource.standard.toLowerCase().includes(normalizedSearch);
 
-      return matchesSubject && matchesWeek && matchesSearch;
+      const matchesWeek =
+        selectedWeek === "All" || resource.week === selectedWeek;
+
+      const matchesAbilityGroup =
+        selectedAbilityGroup === "All" ||
+        resource.ability_group === selectedAbilityGroup;
+
+      const matchesSearch =
+        normalizedSearch.length === 0 ||
+        [
+          resource.title,
+          resource.description,
+          resource.standard,
+          resource.subject,
+          resource.category,
+          resource.ability_group,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedSearch);
+
+      return (
+        matchesSubject &&
+        matchesWeek &&
+        matchesAbilityGroup &&
+        matchesSearch
+      );
     });
-  }, [resources, selectedSubject, selectedWeek, search]);
+  }, [resources, selectedSubject, selectedWeek, selectedAbilityGroup, search]);
 
   return (
     <main>
@@ -46,7 +70,8 @@ export default function GradeResourceBrowser({
         <div>
           <h1 className="text-4xl font-bold text-slate-900">{grade}</h1>
           <p className="mt-3 text-lg text-slate-600">
-            Browse resources by subject, week, standard, and skill.
+            Browse resources by subject, week, standard, skill, and ability
+            group.
           </p>
         </div>
 
@@ -59,16 +84,18 @@ export default function GradeResourceBrowser({
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search by skill, title, or standard..."
+          placeholder="Search by skill, title, standard, or ability group..."
           className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
         />
 
         <div className="mt-6">
           <p className="mb-3 font-semibold text-slate-900">Subject</p>
+
           <div className="flex flex-wrap gap-3">
             {subjects.map((subject) => (
               <button
                 key={subject}
+                type="button"
                 onClick={() => setSelectedSubject(subject)}
                 className={`rounded-full px-5 py-2 font-medium ${
                   selectedSubject === subject
@@ -84,10 +111,12 @@ export default function GradeResourceBrowser({
 
         <div className="mt-6">
           <p className="mb-3 font-semibold text-slate-900">Week</p>
+
           <div className="flex flex-wrap gap-3">
             {weeks.map((week) => (
               <button
                 key={week}
+                type="button"
                 onClick={() => setSelectedWeek(week)}
                 className={`rounded-full px-5 py-2 font-medium ${
                   selectedWeek === week
@@ -96,6 +125,27 @@ export default function GradeResourceBrowser({
                 }`}
               >
                 {week === "All" ? "All Weeks" : `Week ${week}`}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <p className="mb-3 font-semibold text-slate-900">Ability Group</p>
+
+          <div className="flex flex-wrap gap-3">
+            {abilityGroups.map((group) => (
+              <button
+                key={group}
+                type="button"
+                onClick={() => setSelectedAbilityGroup(group)}
+                className={`rounded-full px-5 py-2 font-medium ${
+                  selectedAbilityGroup === group
+                    ? "bg-emerald-600 text-white"
+                    : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                }`}
+              >
+                {group === "All" ? "All Groups" : group}
               </button>
             ))}
           </div>
@@ -113,7 +163,7 @@ export default function GradeResourceBrowser({
               No resources found
             </h2>
             <p className="mt-3 text-slate-600">
-              Try changing the subject, week, or search term.
+              Try changing the subject, week, ability group, or search term.
             </p>
           </div>
         )}

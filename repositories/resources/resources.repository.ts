@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import type {
+  AbilityGroup,
   CreateResourceInput,
   Resource,
   UpdateResourceInput,
@@ -15,6 +16,7 @@ type SupabaseResource = {
   week: number;
   standard: string | null;
   category: Resource["category"];
+  ability_group: AbilityGroup | null;
   featured: boolean;
   status: Resource["status"];
   thumbnail: string | null;
@@ -34,6 +36,7 @@ function mapResource(resource: SupabaseResource): Resource {
     week: resource.week,
     standard: resource.standard ?? "",
     category: resource.category,
+    ability_group: resource.ability_group ?? "All",
     featured: resource.featured,
     status: resource.status,
     thumbnail: resource.thumbnail ?? "",
@@ -86,6 +89,7 @@ export async function createResourceInSupabase(
       week: input.week,
       standard: input.standard,
       category: input.category,
+      ability_group: input.ability_group ?? "All",
       featured: input.featured,
       status: input.status,
       thumbnail: input.thumbnail,

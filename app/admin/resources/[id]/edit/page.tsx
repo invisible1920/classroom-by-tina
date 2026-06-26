@@ -14,11 +14,13 @@ import {
 import { getResource, updateResource } from "@/services";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import type {
+  AbilityGroup,
   Grade,
   ResourceCategory,
   ResourceStatus,
   Subject,
 } from "@/types/resource";
+
 
 const grades: Grade[] = ["Kindergarten", "First Grade", "Second Grade"];
 const subjects: Subject[] = ["ELA", "Math", "Science", "Social Studies"];
@@ -33,6 +35,13 @@ const categories: ResourceCategory[] = [
 ];
 
 const statuses: ResourceStatus[] = ["draft", "published", "archived"];
+
+const abilityGroups: AbilityGroup[] = [
+  "All",
+  "Low",
+  "Medium",
+  "High",
+];
 
 type EditResourcePageProps = {
   params: Promise<{
@@ -54,10 +63,16 @@ async function updateResourceAction(formData: FormData) {
   const week = Number(formData.get("week") ?? 1);
   const standard = String(formData.get("standard") ?? "").trim();
   const category = String(
-    formData.get("category") ?? "Lesson Plan"
-  ) as ResourceCategory;
-  const status = String(formData.get("status") ?? "draft") as ResourceStatus;
-  const featured = formData.get("featured") === "on";
+  formData.get("category") ?? "Lesson Plan"
+) as ResourceCategory;
+
+const abilityGroup = String(
+  formData.get("ability_group") ?? "All"
+) as AbilityGroup;
+
+const status = String(formData.get("status") ?? "draft") as ResourceStatus;
+
+const featured = formData.get("featured") === "on";
 
   const pdfFile = formData.get("pdf") as File | null;
   const thumbnailFile = formData.get("thumbnail") as File | null;
@@ -89,6 +104,7 @@ async function updateResourceAction(formData: FormData) {
     week: Number.isFinite(week) && week > 0 ? week : 1,
     standard,
     category,
+    ability_group: abilityGroup,
     featured,
     status,
     pdf,
@@ -240,7 +256,7 @@ export default async function EditResourcePage({
                 </Field>
               </div>
 
-              <div className="grid gap-5 md:grid-cols-3">
+              <div className="grid gap-5 md:grid-cols-4">
                 <Field label="Week">
                   <input
                     name="week"
@@ -273,6 +289,19 @@ export default async function EditResourcePage({
                     ))}
                   </select>
                 </Field>
+                <Field label="Ability Group">
+  <select
+    name="ability_group"
+    defaultValue={resource.ability_group ?? "All"}
+    className="admin-input"
+  >
+    {abilityGroups.map((group) => (
+      <option key={group} value={group}>
+        {group}
+      </option>
+    ))}
+  </select>
+</Field>
               </div>
 
               <Field label="Status">

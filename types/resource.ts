@@ -13,6 +13,8 @@ export type ResourceCategory =
 
 export type ResourceStatus = "draft" | "published" | "archived";
 
+export type AbilityGroup = "All" | "Low" | "Medium" | "High";
+
 export interface Resource {
   id: string;
   slug: string;

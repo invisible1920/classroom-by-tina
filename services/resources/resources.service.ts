@@ -6,6 +6,7 @@ import {
   restoreResourceInSupabase,
 } from "@/repositories/resources/resources.repository";
 import type {
+  AbilityGroup,
   CreateResourceInput,
   Grade,
   Resource,
@@ -15,7 +16,13 @@ import type {
   UpdateResourceInput,
 } from "@/types/resource";
 
-export type ResourceSortBy = "title" | "grade" | "subject" | "week" | "updatedAt";
+export type ResourceSortBy =
+  | "title"
+  | "grade"
+  | "subject"
+  | "week"
+  | "updatedAt";
+
 export type SortOrder = "asc" | "desc";
 
 export type GetResourcesOptions = {
@@ -23,6 +30,7 @@ export type GetResourcesOptions = {
   grade?: Grade | "All Grades";
   subject?: Subject | "All Subjects";
   category?: ResourceCategory | "All Categories";
+  ability_group?: AbilityGroup | "All Ability Groups";
   status?: ResourceStatus | "all";
   featured?: boolean;
   sortBy?: ResourceSortBy;
@@ -49,6 +57,7 @@ export async function getResources(
     grade = "All Grades",
     subject = "All Subjects",
     category = "All Categories",
+    ability_group = "All Ability Groups",
     status = "all",
     featured,
     sortBy = "updatedAt",
@@ -69,6 +78,7 @@ export async function getResources(
         resource.subject,
         resource.standard,
         resource.category,
+        resource.ability_group,
         resource.status,
       ]
         .join(" ")
@@ -76,11 +86,19 @@ export async function getResources(
         .includes(normalizedSearch);
 
     const matchesGrade = grade === "All Grades" || resource.grade === grade;
+
     const matchesSubject =
       subject === "All Subjects" || resource.subject === subject;
+
     const matchesCategory =
       category === "All Categories" || resource.category === category;
+
+    const matchesAbilityGroup =
+      ability_group === "All Ability Groups" ||
+      resource.ability_group === ability_group;
+
     const matchesStatus = status === "all" || resource.status === status;
+
     const matchesFeatured =
       typeof featured === "boolean" ? resource.featured === featured : true;
 
@@ -89,6 +107,7 @@ export async function getResources(
       matchesGrade &&
       matchesSubject &&
       matchesCategory &&
+      matchesAbilityGroup &&
       matchesStatus &&
       matchesFeatured
     );
@@ -139,6 +158,7 @@ export async function createResource(
 
   return createResourceInSupabase({
     ...input,
+    ability_group: input.ability_group ?? "All",
     slug,
   });
 }
@@ -147,16 +167,17 @@ export async function updateResource(
   id: string,
   updates: UpdateResourceInput
 ): Promise<Resource | null> {
-  return updateResourceInSupabase(id, updates);
+  return updateResourceInSupabase(id, {
+    ...updates,
+    ability_group: updates.ability_group ?? "All",
+  });
 }
 
 export async function deleteResource(id: string): Promise<Resource | null> {
   return archiveResource(id);
 }
 
-export async function archiveResource(
-  id: string
-): Promise<Resource | null> {
+export async function archiveResource(id: string): Promise<Resource | null> {
   return archiveResourceInSupabase(id);
 }
 
@@ -175,6 +196,7 @@ export async function duplicateResource(id: string): Promise<Resource | null> {
     week: existing.week,
     standard: existing.standard,
     category: existing.category,
+    ability_group: existing.ability_group ?? "All",
     thumbnail: existing.thumbnail,
     pdf: existing.pdf,
     featured: false,

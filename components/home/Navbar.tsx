@@ -3,17 +3,17 @@ import Link from "next/link";
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-amber-100/80 bg-[#fff8f0]/90 backdrop-blur-xl">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
         <Link href="/" className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1f2a44] text-lg font-black text-white shadow-sm">
             T
           </div>
 
           <div>
-            <p className="text-lg font-black tracking-tight text-[#1f2a44]">
+            <p className="text-base font-black tracking-tight text-[#1f2a44] sm:text-lg">
               Classroom by Tina
             </p>
-            <p className="-mt-1 text-xs font-black uppercase tracking-widest text-amber-700">
+            <p className="-mt-1 hidden text-xs font-black uppercase tracking-widest text-amber-700 sm:block">
               K–2 Teacher Platform
             </p>
           </div>

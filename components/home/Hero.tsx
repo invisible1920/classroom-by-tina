@@ -6,7 +6,7 @@ import MarketingDashboardMockup from "./MarketingDashboardMockup";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden px-6 pb-24 pt-20">
+    <section className="relative overflow-x-hidden px-4 pb-20 pt-14 sm:px-6 sm:pb-24 sm:pt-20">
       <div className="absolute left-1/2 top-12 -z-10 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-[#f5b942]/30 blur-3xl" />
 
       <ClassroomIllustration />

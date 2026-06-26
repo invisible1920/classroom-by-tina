@@ -1,19 +1,20 @@
 import Link from "next/link";
-import {
-  ArrowLeft,
-  FilePlus2,
-  Search,
-} from "lucide-react";
-
-
+import { ArrowLeft, FilePlus2, Search } from "lucide-react";
 
 import { getResources } from "@/services";
 import Card from "@/components/ui/Card";
-import type { Grade, ResourceCategory, Subject } from "@/types/resource";
+import type {
+  AbilityGroup,
+  Grade,
+  ResourceCategory,
+  Subject,
+} from "@/types/resource";
 import ResourceCard from "@/components/admin/resources/ResourceCard";
 
 const grades = ["All Grades", "Kindergarten", "First Grade", "Second Grade"];
+
 const subjects = ["All Subjects", "ELA", "Math", "Science", "Social Studies"];
+
 const categories = [
   "All Categories",
   "Lesson Plan",
@@ -24,6 +25,15 @@ const categories = [
   "Slides",
   "Activity",
 ];
+
+const abilityGroups = [
+  "All Ability Groups",
+  "All",
+  "Low",
+  "Medium",
+  "High",
+];
+
 const sortOptions = [
   { label: "Recently Edited", value: "updatedAt:desc" },
   { label: "Oldest Edited", value: "updatedAt:asc" },
@@ -39,6 +49,7 @@ type AdminResourcesPageProps = {
     grade?: string;
     subject?: string;
     category?: string;
+    ability_group?: string;
     sort?: string;
     page?: string;
   }>;
@@ -48,6 +59,7 @@ export default async function AdminResourcesPage({
   searchParams,
 }: AdminResourcesPageProps) {
   const params = await searchParams;
+
   const [sortBy = "updatedAt", sortOrder = "desc"] = (
     params.sort ?? "updatedAt:desc"
   ).split(":");
@@ -61,6 +73,10 @@ export default async function AdminResourcesPage({
     category: normalizeOption(params.category, "All Categories") as
       | ResourceCategory
       | "All Categories",
+    ability_group: normalizeOption(
+      params.ability_group,
+      "All Ability Groups"
+    ) as AbilityGroup | "All Ability Groups",
     sortBy: sortBy as "title" | "grade" | "subject" | "week" | "updatedAt",
     sortOrder: sortOrder === "asc" ? "asc" : "desc",
     page: Number(params.page ?? 1),
@@ -68,7 +84,12 @@ export default async function AdminResourcesPage({
   });
 
   const allResources = await getResources({ pageSize: 1 });
-  const featuredResources = await getResources({ featured: true, pageSize: 1 });
+
+  const featuredResources = await getResources({
+    featured: true,
+    pageSize: 1,
+  });
+
   const firstGradeResources = await getResources({
     grade: "First Grade",
     pageSize: 1,
@@ -111,13 +132,22 @@ export default async function AdminResourcesPage({
         </section>
 
         <section className="mt-8 grid gap-5 md:grid-cols-3">
-          <AdminResourceStat label="Total Resources" value={allResources.total} />
-          <AdminResourceStat label="Featured" value={featuredResources.total} />
-          <AdminResourceStat label="First Grade" value={firstGradeResources.total} />
+          <AdminResourceStat
+            label="Total Resources"
+            value={allResources.total}
+          />
+          <AdminResourceStat
+            label="Featured"
+            value={featuredResources.total}
+          />
+          <AdminResourceStat
+            label="First Grade"
+            value={firstGradeResources.total}
+          />
         </section>
 
         <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <form className="grid gap-4 lg:grid-cols-[1fr_180px_180px_180px_180px]">
+          <form className="grid gap-4 lg:grid-cols-[1fr_165px_165px_165px_165px_165px]">
             <div className="relative">
               <Search
                 size={18}
@@ -133,30 +163,45 @@ export default async function AdminResourcesPage({
             </div>
 
             <FilterSelect name="grade" value={params.grade} options={grades} />
-            <FilterSelect name="subject" value={params.subject} options={subjects} />
+
+            <FilterSelect
+              name="subject"
+              value={params.subject}
+              options={subjects}
+            />
+
             <FilterSelect
               name="category"
               value={params.category}
               options={categories}
             />
-            <FilterSelect name="sort" value={params.sort} options={sortOptions} />
+
+            <FilterSelect
+              name="ability_group"
+              value={params.ability_group}
+              options={abilityGroups}
+            />
+
+            <FilterSelect
+              name="sort"
+              value={params.sort}
+              options={sortOptions}
+            />
 
             <button
               type="submit"
-              className="rounded-full bg-[#1f2a44] px-5 py-3 font-black text-white transition hover:-translate-y-0.5 lg:col-start-5"
+              className="rounded-full bg-[#1f2a44] px-5 py-3 font-black text-white transition hover:-translate-y-0.5 lg:col-start-6"
             >
               Apply
             </button>
           </form>
         </section>
+
         <section className="mt-8 grid gap-6">
-  {resources.items.map((resource) => (
-    <ResourceCard
-      key={resource.id}
-      resource={resource}
-    />
-  ))}
-</section>
+          {resources.items.map((resource) => (
+            <ResourceCard key={resource.id} resource={resource} />
+          ))}
+        </section>
 
         <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm md:flex-row">
           <p className="font-black text-slate-600">
@@ -171,9 +216,11 @@ export default async function AdminResourcesPage({
             >
               Previous
             </PaginationLink>
+
             <span className="font-black text-[#1f2a44]">
               Page {resources.page} of {resources.totalPages}
             </span>
+
             <PaginationLink
               disabled={resources.page >= resources.totalPages}
               page={resources.page + 1}
@@ -273,5 +320,3 @@ function AdminResourceStat({
     </Card>
   );
 }
-
-
