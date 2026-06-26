@@ -5,9 +5,10 @@ export type Teacher = {
   id: string;
   full_name: string | null;
   email: string;
-  avatar_url: string | null;
+  avatar_url?: string | null;
   role: TeacherRole;
-  subscription: TeacherSubscription;
+  subscription_status: TeacherSubscription;
   created_at: string;
-  last_login: string | null;
+  updated_at?: string | null;
+  last_login?: string | null;
 };

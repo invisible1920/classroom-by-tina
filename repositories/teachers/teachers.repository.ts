@@ -7,11 +7,10 @@ export async function getTeachers(): Promise<Teacher[]> {
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq("role", "teacher")
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch teachers:", error);
+    console.error("Failed to fetch accounts:", error);
     return [];
   }
 
