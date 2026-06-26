@@ -15,6 +15,7 @@ import ArchiveResourceButton from "@/components/admin/resources/ArchiveResourceB
 import { getResources } from "@/services";
 import type { Grade, ResourceCategory, Subject } from "@/types/resource";
 import DuplicateResourceButton from "@/components/admin/resources/DuplicateResourceButton";
+import RestoreResourceButton from "@/components/admin/resources/RestoreResourceButton";
 
 const grades = ["All Grades", "Kindergarten", "First Grade", "Second Grade"];
 const subjects = ["All Subjects", "ELA", "Math", "Science", "Social Studies"];
@@ -234,7 +235,11 @@ export default async function AdminResourcesPage({
                     <span className="hidden xl:inline">Edit</span>
                   </Link>
                   <DuplicateResourceButton id={resource.id} />
-                  <ArchiveResourceButton id={resource.id} />
+                  {resource.status === "archived" ? (
+  <RestoreResourceButton id={resource.id} />
+) : (
+  <ArchiveResourceButton id={resource.id} />
+)}
                 </div>
               </div>
             </Card>

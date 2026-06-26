@@ -3,6 +3,7 @@ import {
   createResourceInSupabase,
   getResourcesFromSupabase,
   updateResourceInSupabase,
+  restoreResourceInSupabase,
 } from "@/repositories/resources/resources.repository";
 import type {
   CreateResourceInput,
@@ -179,6 +180,12 @@ export async function duplicateResource(id: string): Promise<Resource | null> {
     featured: false,
     status: "draft",
   });
+}
+
+export async function restoreResource(
+  id: string
+): Promise<Resource | null> {
+  return restoreResourceInSupabase(id);
 }
 
 export async function searchResources(
