@@ -9,7 +9,7 @@ export default function FinalCTA() {
       <div className="absolute left-1/2 top-1/2 -z-10 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#f5b942]/15 blur-3xl" />
 
       <div className="mx-auto max-w-4xl text-center text-white">
-        <h2 className="text-5xl font-black leading-tight md:text-6xl">
+        <h2 className="text-4xl font-black leading-tight sm:text-5xl md:text-6xl">
           Ready to simplify lesson planning?
         </h2>
 

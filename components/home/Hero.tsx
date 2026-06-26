@@ -18,13 +18,13 @@ export default function Hero() {
             Built by a real First Grade teacher
           </div>
 
-          <h1 className="mt-8 max-w-5xl text-5xl font-black leading-[0.95] tracking-tight text-[#1f2a44] md:text-7xl">
+          <h1 className="mt-8 max-w-5xl text-4xl font-black leading-tight tracking-tight text-[#1f2a44] sm:text-5xl lg:text-7xl">
             Create better lessons.
             <br />
             Save hours every week.
           </h1>
 
-          <p className="mt-7 max-w-2xl text-xl leading-8 text-slate-600">
+          <p className="mt-7 max-w-2xl text-lg sm:text-lg leading-8 text-slate-600 sm:text-xl">
             Classroom by Tina gives K–2 teachers organized lesson plans,
             centers, assessments, homework, parent letters, classroom
             activities, and soon AI-powered teaching tools.
