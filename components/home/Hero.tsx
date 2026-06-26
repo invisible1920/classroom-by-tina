@@ -35,7 +35,7 @@ export default function Hero() {
               href="/signup"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f2a44] px-7 py-4 font-black text-white shadow-xl shadow-slate-950/10 transition hover:-translate-y-0.5 hover:bg-slate-800"
             >
-              Start free
+              Sign up
               <ArrowRight size={18} />
             </Link>
 
