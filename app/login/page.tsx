@@ -45,10 +45,13 @@ async function signInWithGoogle() {
 
   const supabase = await createClient();
 
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://classroombytina.com";
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: `${siteUrl}/auth/callback`,
     },
   });
 
