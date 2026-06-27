@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 
@@ -12,6 +11,9 @@ async function signup(formData: FormData) {
 
   const supabase = await createClient();
 
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://classroombytina.com";
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
@@ -19,12 +21,11 @@ async function signup(formData: FormData) {
       data: {
         full_name: fullName,
       },
-      emailRedirectTo: "https://www.classroombytina.com/auth/callback",
+      emailRedirectTo: `${siteUrl}/auth/callback`,
     },
   });
 
   if (error) {
-    console.error("SIGNUP ERROR:", error);
     redirect(`/signup?error=${encodeURIComponent(error.message)}`);
   }
 
@@ -47,21 +48,14 @@ async function signInWithGoogle() {
   });
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+    redirect(`/signup?error=${encodeURIComponent(error.message)}`);
   }
 
   if (data.url) {
     redirect(data.url);
   }
 
-  redirect("/login?error=Could not start Google sign in");
-}
-
-  if (data.url) {
-    redirect(data.url);
-  }
-
-  redirect("/login?error=Could not start Google sign in");
+  redirect("/signup?error=Could not start Google sign in");
 }
 
 export default async function SignupPage({
