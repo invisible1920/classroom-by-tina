@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 
@@ -18,6 +19,7 @@ async function signup(formData: FormData) {
       data: {
         full_name: fullName,
       },
+      emailRedirectTo: "https://www.classroombytina.com/auth/callback",
     },
   });
 
@@ -33,11 +35,15 @@ async function signInWithGoogle() {
   "use server";
 
   const supabase = await createClient();
+  const headersList = await headers();
+
+  const origin =
+    headersList.get("origin") ?? "https://www.classroombytina.com";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "http://localhost:3000/auth/callback",
+      redirectTo: `${origin}/auth/callback`,
     },
   });
 
