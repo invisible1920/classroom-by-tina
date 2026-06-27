@@ -15,6 +15,9 @@ import type {
   Subject,
   UpdateResourceInput,
 } from "@/types/resource";
+import { getTeacherVisibleMonths } from "@/lib/month-access";
+
+import { getCurrentUserAccess } from "@/lib/auth/get-current-user-access";
 
 export type ResourceSortBy =
   | "title"
@@ -28,6 +31,7 @@ export type SortOrder = "asc" | "desc";
 
 export type GetResourcesOptions = {
   search?: string;
+  isAdmin?: boolean;
   grade?: Grade | "All Grades";
   subject?: Subject | "All Subjects";
   month?: string;
@@ -52,8 +56,6 @@ export type PaginatedResources = {
 export async function getResources(
   options: GetResourcesOptions = {}
 ): Promise<PaginatedResources> {
-  const resources = await getResourcesFromSupabase();
-
   const {
     search = "",
     grade = "All Grades",
@@ -67,7 +69,18 @@ export async function getResources(
     sortOrder = "desc",
     page = 1,
     pageSize = 12,
+    isAdmin = false,
   } = options;
+
+  const access = await getCurrentUserAccess();
+const effectiveIsAdmin = isAdmin || access.isAdmin;
+
+const activeMonths = effectiveIsAdmin ? undefined : getTeacherVisibleMonths();
+
+const resources = await getResourcesFromSupabase({
+  activeMonths,
+  isAdmin: effectiveIsAdmin,
+});
 
   const normalizedSearch = search.trim().toLowerCase();
 
@@ -94,7 +107,7 @@ export async function getResources(
     const matchesSubject =
       subject === "All Subjects" || resource.subject === subject;
 
-    const matchesMonth = month === "All Months" || resource.month === month;  
+    const matchesMonth = month === "All Months" || resource.month === month;
 
     const matchesCategory =
       category === "All Categories" || resource.category === category;
@@ -148,8 +161,21 @@ export async function getResources(
   };
 }
 
-export async function getResource(id: string): Promise<Resource | null> {
-  const resources = await getResourcesFromSupabase();
+export async function getResource(
+  id: string,
+  options: { isAdmin?: boolean } = {}
+): Promise<Resource | null> {
+  const access = await getCurrentUserAccess();
+  const effectiveIsAdmin = options.isAdmin || access.isAdmin;
+
+  const activeMonths = effectiveIsAdmin
+  ? undefined
+  : getTeacherVisibleMonths();
+
+const resources = await getResourcesFromSupabase({
+  activeMonths,
+  isAdmin: effectiveIsAdmin,
+});
 
   return (
     resources.find((resource) => resource.id === id || resource.slug === id) ??
@@ -189,7 +215,7 @@ export async function archiveResource(id: string): Promise<Resource | null> {
 }
 
 export async function duplicateResource(id: string): Promise<Resource | null> {
-  const existing = await getResource(id);
+  const existing = await getResource(id, { isAdmin: true });
 
   if (!existing) {
     return null;
@@ -212,9 +238,7 @@ export async function duplicateResource(id: string): Promise<Resource | null> {
   });
 }
 
-export async function restoreResource(
-  id: string
-): Promise<Resource | null> {
+export async function restoreResource(id: string): Promise<Resource | null> {
   return restoreResourceInSupabase(id);
 }
 

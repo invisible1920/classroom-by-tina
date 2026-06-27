@@ -170,7 +170,7 @@ export default async function EditResourcePage({
   params,
 }: EditResourcePageProps) {
   const { id } = await params;
-  const resource = await getResource(id);
+  const resource = await getResource(id, { isAdmin: true });
 
   if (!resource) {
     notFound();

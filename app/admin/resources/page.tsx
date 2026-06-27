@@ -79,6 +79,7 @@ export default async function AdminResourcesPage({
   ).split(":");
 
   const resources = await getResources({
+    isAdmin: true,
     search: params.search,
     grade: normalizeOption(params.grade, "All Grades") as Grade | "All Grades",
     subject: normalizeOption(params.subject, "All Subjects") as
@@ -99,15 +100,16 @@ export default async function AdminResourcesPage({
   });
 
   const [allResources, featuredResources, ...gradeStats] = await Promise.all([
-    getResources({ pageSize: 1 }),
-    getResources({ featured: true, pageSize: 1 }),
-    ...gradeStatFilters.map((grade) =>
-      getResources({
-        grade,
-        pageSize: 1,
-      })
-    ),
-  ]);
+  getResources({ isAdmin: true, pageSize: 1 }),
+  getResources({ isAdmin: true, featured: true, pageSize: 1 }),
+  ...gradeStatFilters.map((grade) =>
+    getResources({
+      isAdmin: true,
+      grade,
+      pageSize: 1,
+    })
+  ),
+]);
 
   return (
     <main className="min-h-screen bg-[#fff8f0] px-6 py-10">

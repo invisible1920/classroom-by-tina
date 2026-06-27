@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { BookOpen, Download, Star, Users } from "lucide-react";
+import { BookOpen, Clock, Download, Star } from "lucide-react";
 
 import ContinueTeachingCard from "@/components/dashboard/ContinueTeachingCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -53,11 +53,26 @@ export default async function DashboardPage() {
     redirect("/subscribe");
   }
 
+  const displayName =
+    user.user_metadata?.full_name ||
+    user.user_metadata?.name ||
+    user.email?.split("@")[0] ||
+    "Teacher";
+
   const featuredResources = await getResources({
     featured: true,
     status: "published",
     pageSize: 3,
   });
+
+  const { data: favoriteRows } = await supabase
+  .from("resource_favorites")
+  .select("resource_id")
+  .eq("user_id", user.id);
+
+  const favoriteResourceIds = new Set(
+    (favoriteRows ?? []).map((favorite) => favorite.resource_id)
+  );
 
   const recentResources = await getResources({
     status: "published",
@@ -66,37 +81,71 @@ export default async function DashboardPage() {
     pageSize: 3,
   });
 
+  const thirtyDaysAgo = new Date(
+    Date.now() - 30 * 24 * 60 * 60 * 1000
+  ).toISOString();
+
+  const [
+    { count: resourceCount },
+    { count: featuredCount },
+    { count: myDownloadCount },
+    { count: recentlyAddedCount },
+  ] = await Promise.all([
+    supabase
+      .from("resources")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published"),
+
+    supabase
+      .from("resources")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published")
+      .eq("featured", true),
+
+    supabase
+      .from("resource_downloads")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id),
+
+    supabase
+      .from("resources")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published")
+      .gte("created_at", thirtyDaysAgo),
+  ]);
+  
+
   return (
     <>
-      <DashboardHeader />
+      <DashboardHeader name={displayName} />
 
       <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatsCard
           title="Resources"
-          value="245"
-          subtitle="Across K–2"
+          value={String(resourceCount ?? 0)}
+          subtitle="Available to you"
           icon={<BookOpen size={24} />}
         />
 
         <StatsCard
           title="Featured"
-          value="12"
-          subtitle="This week"
+          value={String(featuredCount ?? 0)}
+          subtitle="Recommended resources"
           icon={<Star size={24} />}
         />
 
         <StatsCard
-          title="Downloads"
-          value="3,422"
-          subtitle="Teacher downloads"
-          icon={<Download size={24} />}
+          title="New"
+          value={String(recentlyAddedCount ?? 0)}
+          subtitle="Added this month"
+          icon={<Clock size={24} />}
         />
 
         <StatsCard
-          title="Teachers"
-          value="218"
-          subtitle="Founding members"
-          icon={<Users size={24} />}
+          title="My Downloads"
+          value={String(myDownloadCount ?? 0)}
+          subtitle="Resources downloaded"
+          icon={<Download size={24} />}
         />
       </section>
 
@@ -106,7 +155,7 @@ export default async function DashboardPage() {
         <SectionTitle
           eyebrow="Teaching Library"
           title="Browse by Grade"
-          description="Start with the grade level, then move into subject, week, and resource type."
+          description="Start with the grade level, then move into subject, month, week, and resource type."
         />
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
@@ -123,15 +172,19 @@ export default async function DashboardPage() {
 
       <section className="mt-12">
         <SectionTitle
-          eyebrow="This Week"
+          eyebrow="Recommended"
           title="Featured Resources"
-          description="High-priority resources Tina wants teachers to see first."
+          description="High-priority resources selected for teachers to see first."
         />
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
-          {featuredResources.items.map((resource) => (
-            <ResourceCard key={resource.id} resource={resource} />
-          ))}
+          {recentResources.items.map((resource) => (
+  <ResourceCard
+    key={resource.id}
+    resource={resource}
+    isFavorite={favoriteResourceIds.has(resource.id)}
+  />
+))}
         </div>
       </section>
 

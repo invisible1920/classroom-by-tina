@@ -4,9 +4,12 @@ import {
   Download,
   Heart,
   Home,
+  LogOut,
   Settings,
   Sparkles,
 } from "lucide-react";
+
+import { signOut } from "@/app/actions/auth";
 
 export default function DashboardLayout({
   children,
@@ -26,7 +29,7 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <aside className="fixed left-0 top-0 h-screen w-72 border-r border-slate-200 bg-white p-6">
+      <aside className="fixed left-0 top-0 flex h-screen w-72 flex-col border-r border-slate-200 bg-white p-6">
         <Link href="/" className="block">
           <p className="text-sm font-semibold uppercase tracking-widest text-blue-600">
             Classroom
@@ -34,7 +37,7 @@ export default function DashboardLayout({
           <h1 className="mt-1 text-2xl font-bold text-slate-900">by Tina</h1>
         </Link>
 
-        <nav className="mt-10 space-y-8">
+        <nav className="mt-10 flex-1 space-y-8">
           <div>
             <p className="px-4 text-xs font-bold uppercase tracking-widest text-slate-400">
               Main
@@ -107,8 +110,18 @@ export default function DashboardLayout({
               <Settings size={20} />
               Account
             </Link>
+            
           </div>
         </nav>
+        <form action={signOut} className="border-t border-slate-200 pt-4">
+  <button
+    type="submit"
+    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-red-50 hover:text-red-600"
+  >
+    <LogOut size={20} />
+    Sign Out
+  </button>
+</form>
       </aside>
 
       <main className="ml-72 min-h-screen p-10">{children}</main>

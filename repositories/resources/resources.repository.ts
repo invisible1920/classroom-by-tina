@@ -48,11 +48,20 @@ function mapResource(resource: SupabaseResource): Resource {
   };
 }
 
-export async function getResourcesFromSupabase(): Promise<Resource[]> {
-  const { data, error } = await supabaseAdmin
+export async function getResourcesFromSupabase(options?: {
+  activeMonths?: string[];
+  isAdmin?: boolean;
+}): Promise<Resource[]> {
+  let query = supabaseAdmin
     .from("resources")
     .select("*")
     .order("created_at", { ascending: false });
+
+  if (!options?.isAdmin && options?.activeMonths?.length) {
+  query = query.in("month", options.activeMonths);
+}
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);

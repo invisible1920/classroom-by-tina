@@ -1,35 +1,54 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, FileText, Star } from "lucide-react";
+import { ArrowRight, FileText, Heart, Star } from "lucide-react";
 
 import type { Resource } from "@/types/resource";
+import { toggleFavorite } from "@/app/dashboard/favorites/actions";
 
 type ResourceCardProps = {
   resource: Resource;
+  isFavorite?: boolean;
 };
 
-export default function ResourceCard({ resource }: ResourceCardProps) {
+export default function ResourceCard({
+  resource,
+  isFavorite = false,
+}: ResourceCardProps) {
   const abilityGroup = resource.ability_group ?? "All";
 
   return (
-    <Link
-      href={`/dashboard/resources/${resource.id}`}
-      className="group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-    >
-      {/* Thumbnail */}
+    <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <div className="relative h-52 w-full bg-slate-100">
-        {resource.thumbnail ? (
-          <Image
-            src={resource.thumbnail}
-            alt={resource.title}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-blue-600">
-            <FileText size={40} />
-          </div>
-        )}
+        <Link href={`/dashboard/resources/${resource.id}`} className="block h-full">
+          {resource.thumbnail ? (
+            <Image
+              src={resource.thumbnail}
+              alt={resource.title}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-blue-600">
+              <FileText size={40} />
+            </div>
+          )}
+        </Link>
+
+        <div className="absolute left-4 top-4 z-10">
+          <form action={toggleFavorite.bind(null, resource.id)}>
+  <button
+    type="submit"
+    aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+    className={`flex h-10 w-10 items-center justify-center rounded-full shadow transition hover:scale-105 ${
+      isFavorite
+        ? "bg-rose-500 text-white"
+        : "bg-white text-slate-500 hover:text-rose-500"
+    }`}
+  >
+    <Heart size={18} fill={isFavorite ? "currentColor" : "none"} />
+  </button>
+</form>
+        </div>
 
         <div className="absolute right-4 top-4 flex flex-wrap justify-end gap-2">
           {resource.featured && (
@@ -47,15 +66,16 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
         </div>
       </div>
 
-      {/* Content */}
       <div className="p-6">
         <p className="text-sm font-semibold text-blue-600">
           {resource.subject} · {resource.month} · Week {resource.week}
         </p>
 
-        <h2 className="mt-2 text-2xl font-bold text-slate-900">
-          {resource.title}
-        </h2>
+        <Link href={`/dashboard/resources/${resource.id}`}>
+          <h2 className="mt-2 text-2xl font-bold text-slate-900 transition group-hover:text-blue-600">
+            {resource.title}
+          </h2>
+        </Link>
 
         <p className="mt-3 line-clamp-3 text-slate-600">
           {resource.description}
@@ -66,11 +86,15 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
             {resource.category}
             {resource.standard ? ` · ${resource.standard}` : ""}
           </p>
-          <span className="flex shrink-0 items-center gap-1 font-semibold text-blue-600 transition-all group-hover:gap-2">
+
+          <Link
+            href={`/dashboard/resources/${resource.id}`}
+            className="flex shrink-0 items-center gap-1 font-semibold text-blue-600 transition-all hover:gap-2"
+          >
             Open <ArrowRight size={16} />
-          </span>
+          </Link>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
