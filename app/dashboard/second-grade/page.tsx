@@ -6,17 +6,13 @@ import { getResources } from "@/services";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function SecondGradePage() {
-  const supabase = await createClient();
+  const access = await getCurrentUserAccess();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!access.userId) {
     redirect("/login");
   }
 
-  const access = await getCurrentUserAccess();
+  const supabase = await createClient();
 
   const resources = await getResources({
     grade: "Second Grade",
@@ -27,7 +23,7 @@ export default async function SecondGradePage() {
   const { data: favorites } = await supabase
     .from("resource_favorites")
     .select("resource_id")
-    .eq("user_id", user.id);
+    .eq("user_id", access.userId);
 
   const favoriteResourceIds =
     favorites?.map((favorite) => favorite.resource_id) ?? [];
