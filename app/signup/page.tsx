@@ -35,27 +35,33 @@ async function signInWithGoogle() {
   "use server";
 
   const supabase = await createClient();
-  const headersList = await headers();
 
-  const origin =
-    headersList.get("origin") ?? "https://www.classroombytina.com";
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://classroombytina.com";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: `${siteUrl}/auth/callback`,
     },
   });
 
   if (error) {
-    redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+    redirect(`/login?error=${encodeURIComponent(error.message)}`);
   }
 
   if (data.url) {
     redirect(data.url);
   }
 
-  redirect("/signup?error=Could not start Google sign in");
+  redirect("/login?error=Could not start Google sign in");
+}
+
+  if (data.url) {
+    redirect(data.url);
+  }
+
+  redirect("/login?error=Could not start Google sign in");
 }
 
 export default async function SignupPage({
