@@ -34,7 +34,7 @@ const adminActions = [
   },
   {
     title: "Analytics",
-    description: "Track downloads, popular grades, subjects, and conversions.",
+    description: "Track downloads, popular resources, teacher activity, and engagement.",
     href: "/admin/analytics",
     icon: BarChart3,
   },
@@ -55,11 +55,9 @@ const adminActions = [
 export default async function AdminPage() {
   const allResources = await getResources({ pageSize: 1 });
   const featuredResources = await getResources({ featured: true, pageSize: 1 });
-  const firstGradeResources = await getResources({
-    grade: "First Grade",
-    pageSize: 1,
-  });
-
+  const kindergartenResources = await getResources({ grade: "Kindergarten", pageSize: 1 });
+const firstGradeResources = await getResources({ grade: "First Grade", pageSize: 1 });
+const secondGradeResources = await getResources({ grade: "Second Grade", pageSize: 1 });
   const totalResources = allResources.total;
 
   return (
@@ -91,25 +89,37 @@ export default async function AdminPage() {
           </div>
         </section>
 
-        <section className="mt-8 grid gap-5 md:grid-cols-3">
-          <AdminStatCard
-            label="Total Resources"
-            value={String(totalResources)}
-            detail="From resource service"
-          />
+        <section className="mt-8 grid gap-5 md:grid-cols-3 xl:grid-cols-5">
+  <AdminStatCard
+    label="Total Resources"
+    value={String(totalResources)}
+    detail="All teaching resources"
+  />
 
-          <AdminStatCard
-            label="Featured"
-            value={String(featuredResources.total)}
-            detail="Highlighted for teachers"
-          />
+  <AdminStatCard
+    label="Featured"
+    value={String(featuredResources.total)}
+    detail="Highlighted for teachers"
+  />
 
-          <AdminStatCard
-            label="First Grade"
-            value={String(firstGradeResources.total)}
-            detail="Resources ready for launch"
-          />
-        </section>
+  <AdminStatCard
+    label="Kindergarten"
+    value={String(kindergartenResources.total)}
+    detail="Kindergarten resources"
+  />
+
+  <AdminStatCard
+    label="First Grade"
+    value={String(firstGradeResources.total)}
+    detail="First grade resources"
+  />
+
+  <AdminStatCard
+    label="Second Grade"
+    value={String(secondGradeResources.total)}
+    detail="Second grade resources"
+  />
+</section>
 
         <section className="mt-12">
           <SectionTitle

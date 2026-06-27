@@ -43,7 +43,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
           </div>
 
           <p className="mt-2 font-semibold text-slate-500">
-            {resource.grade} · {resource.subject} · Week {resource.week}
+            {resource.grade} · {resource.subject} · {resource.month} · Week {resource.week}
           </p>
 
           <p className="mt-4 line-clamp-2 max-w-3xl leading-7 text-slate-600">

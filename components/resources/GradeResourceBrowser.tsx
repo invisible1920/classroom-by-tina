@@ -6,8 +6,24 @@ import ResourceCard from "@/components/resources/ResourceCard";
 import type { Grade, Resource } from "@/types/resource";
 
 const subjects = ["All", "ELA", "Math", "Science", "Social Studies"];
-const weeks = ["All", 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const months = [
+  "All",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+];
+
+const weeks = ["All", 1, 2, 3, 4];
 const abilityGroups = ["All", "Low", "Medium", "High"];
+
 
 type GradeResourceBrowserProps = {
   grade: Grade;
@@ -21,6 +37,7 @@ export default function GradeResourceBrowser({
   const [selectedSubject, setSelectedSubject] = useState("All");
   const [selectedWeek, setSelectedWeek] = useState<string | number>("All");
   const [selectedAbilityGroup, setSelectedAbilityGroup] = useState("All");
+  const [selectedMonth, setSelectedMonth] = useState("All");
   const [search, setSearch] = useState("");
 
   const filteredResources = useMemo(() => {
@@ -29,6 +46,8 @@ export default function GradeResourceBrowser({
     return resources.filter((resource) => {
       const matchesSubject =
         selectedSubject === "All" || resource.subject === selectedSubject;
+      const matchesMonth =
+  selectedMonth === "All" || resource.month === selectedMonth;  
 
       const matchesWeek =
         selectedWeek === "All" || resource.week === selectedWeek;
@@ -44,6 +63,7 @@ export default function GradeResourceBrowser({
           resource.description,
           resource.standard,
           resource.subject,
+          resource.month,
           resource.category,
           resource.ability_group,
         ]
@@ -53,12 +73,20 @@ export default function GradeResourceBrowser({
 
       return (
         matchesSubject &&
+        matchesMonth &&
         matchesWeek &&
         matchesAbilityGroup &&
         matchesSearch
       );
     });
-  }, [resources, selectedSubject, selectedWeek, selectedAbilityGroup, search]);
+  }, [
+  resources,
+  selectedSubject,
+  selectedMonth,
+  selectedWeek,
+  selectedAbilityGroup,
+  search,
+]);
 
   return (
     <main>
@@ -108,6 +136,27 @@ export default function GradeResourceBrowser({
             ))}
           </div>
         </div>
+
+        <div className="mt-6">
+  <p className="mb-3 font-semibold text-slate-900">Month</p>
+
+  <div className="flex flex-wrap gap-3">
+    {months.map((month) => (
+      <button
+        key={month}
+        type="button"
+        onClick={() => setSelectedMonth(month)}
+        className={`rounded-full px-5 py-2 font-medium ${
+          selectedMonth === month
+            ? "bg-[#1f2a44] text-white"
+            : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+        }`}
+      >
+        {month === "All" ? "All Months" : month}
+      </button>
+    ))}
+  </div>
+</div>
 
         <div className="mt-6">
           <p className="mb-3 font-semibold text-slate-900">Week</p>
@@ -163,7 +212,7 @@ export default function GradeResourceBrowser({
               No resources found
             </h2>
             <p className="mt-3 text-slate-600">
-              Try changing the subject, week, ability group, or search term.
+              Try changing the subject, month, week, ability group, or search term.
             </p>
           </div>
         )}

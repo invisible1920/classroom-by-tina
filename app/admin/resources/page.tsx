@@ -26,12 +26,21 @@ const categories = [
   "Activity",
 ];
 
-const abilityGroups = [
-  "All Ability Groups",
-  "All",
-  "Low",
-  "Medium",
-  "High",
+const abilityGroups = ["All Ability Groups", "All", "Low", "Medium", "High"];
+
+const months = [
+  "All Months",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
 ];
 
 const sortOptions = [
@@ -41,13 +50,18 @@ const sortOptions = [
   { label: "Title Z-A", value: "title:desc" },
   { label: "Week Low-High", value: "week:asc" },
   { label: "Week High-Low", value: "week:desc" },
+  { label: "Month A-Z", value: "month:asc" },
+  { label: "Month Z-A", value: "month:desc" },
 ];
+
+const gradeStatFilters = ["Kindergarten", "First Grade", "Second Grade"] as const;
 
 type AdminResourcesPageProps = {
   searchParams: Promise<{
     search?: string;
     grade?: string;
     subject?: string;
+    month?: string;
     category?: string;
     ability_group?: string;
     sort?: string;
@@ -77,23 +91,23 @@ export default async function AdminResourcesPage({
       params.ability_group,
       "All Ability Groups"
     ) as AbilityGroup | "All Ability Groups",
-    sortBy: sortBy as "title" | "grade" | "subject" | "week" | "updatedAt",
+    month: normalizeOption(params.month, "All Months") as string,
+    sortBy: sortBy as "title" | "grade" | "subject" | "month" | "week" | "updatedAt",
     sortOrder: sortOrder === "asc" ? "asc" : "desc",
     page: Number(params.page ?? 1),
     pageSize: 5,
   });
 
-  const allResources = await getResources({ pageSize: 1 });
-
-  const featuredResources = await getResources({
-    featured: true,
-    pageSize: 1,
-  });
-
-  const firstGradeResources = await getResources({
-    grade: "First Grade",
-    pageSize: 1,
-  });
+  const [allResources, featuredResources, ...gradeStats] = await Promise.all([
+    getResources({ pageSize: 1 }),
+    getResources({ featured: true, pageSize: 1 }),
+    ...gradeStatFilters.map((grade) =>
+      getResources({
+        grade,
+        pageSize: 1,
+      })
+    ),
+  ]);
 
   return (
     <main className="min-h-screen bg-[#fff8f0] px-6 py-10">
@@ -131,23 +145,25 @@ export default async function AdminResourcesPage({
           </Link>
         </section>
 
-        <section className="mt-8 grid gap-5 md:grid-cols-3">
+        <section className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
           <AdminResourceStat
             label="Total Resources"
             value={allResources.total}
           />
-          <AdminResourceStat
-            label="Featured"
-            value={featuredResources.total}
-          />
-          <AdminResourceStat
-            label="First Grade"
-            value={firstGradeResources.total}
-          />
+
+          <AdminResourceStat label="Featured" value={featuredResources.total} />
+
+          {gradeStatFilters.map((grade, index) => (
+            <AdminResourceStat
+              key={grade}
+              label={grade}
+              value={gradeStats[index]?.total ?? 0}
+            />
+          ))}
         </section>
 
         <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <form className="grid gap-4 lg:grid-cols-[1fr_165px_165px_165px_165px_165px]">
+          <form className="grid gap-4 lg:grid-cols-[1fr_150px_150px_150px_150px_150px_150px]">
             <div className="relative">
               <Search
                 size={18}
@@ -163,6 +179,8 @@ export default async function AdminResourcesPage({
             </div>
 
             <FilterSelect name="grade" value={params.grade} options={grades} />
+
+            <FilterSelect name="month" value={params.month} options={months} />
 
             <FilterSelect
               name="subject"
@@ -190,7 +208,7 @@ export default async function AdminResourcesPage({
 
             <button
               type="submit"
-              className="rounded-full bg-[#1f2a44] px-5 py-3 font-black text-white transition hover:-translate-y-0.5 lg:col-start-6"
+              className="rounded-full bg-[#1f2a44] px-5 py-3 font-black text-white transition hover:-translate-y-0.5 lg:col-start-7"
             >
               Apply
             </button>

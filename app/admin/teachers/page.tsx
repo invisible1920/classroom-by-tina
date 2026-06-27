@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Search, Users } from "lucide-react";
 import { getTeachers } from "@/services";
 import { RoleSelect, PlanSelect } from "@/components/admin/TeacherSelect";
@@ -27,8 +28,7 @@ export default async function TeachersPage({
       teacher.full_name?.toLowerCase().includes(search) ||
       teacher.email.toLowerCase().includes(search);
 
-    const matchesRole =
-      roleFilter === "all" || teacher.role === roleFilter;
+    const matchesRole = roleFilter === "all" || teacher.role === roleFilter;
 
     const matchesPlan =
       planFilter === "all" || teacher.subscription_status === planFilter;
@@ -123,6 +123,7 @@ export default async function TeachersPage({
                   <th className="py-3 font-black">Plan</th>
                   <th className="py-3 font-black">Joined</th>
                   <th className="py-3 font-black">Update</th>
+                  <th className="py-3 font-black">Details</th>
                 </tr>
               </thead>
 
@@ -176,13 +177,22 @@ export default async function TeachersPage({
                           />
                         </div>
                       </td>
+
+                      <td className="py-4">
+                        <Link
+                          href={`/admin/teachers/${teacher.id}`}
+                          className="rounded-full bg-[#1f2a44] px-4 py-2 text-xs font-black text-white"
+                        >
+                          View
+                        </Link>
+                      </td>
                     </tr>
                   );
                 })}
 
                 {filteredTeachers.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-slate-500">
+                    <td colSpan={6} className="py-8 text-center text-slate-500">
                       No accounts found.
                     </td>
                   </tr>

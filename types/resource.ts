@@ -22,6 +22,7 @@ export interface Resource {
   description: string;
   grade: Grade;
   subject: Subject;
+  month: string;
   week: number;
   standard: string;
   category: ResourceCategory;
@@ -40,6 +41,7 @@ export type CreateResourceInput = {
   description: string;
   grade: Grade;
   subject: Subject;
+  month: string;
   week: number;
   standard: string;
   category: ResourceCategory;

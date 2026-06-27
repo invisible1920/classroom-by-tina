@@ -50,7 +50,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
       {/* Content */}
       <div className="p-6">
         <p className="text-sm font-semibold text-blue-600">
-          {resource.subject} · Week {resource.week}
+          {resource.subject} · {resource.month} · Week {resource.week}
         </p>
 
         <h2 className="mt-2 text-2xl font-bold text-slate-900">
@@ -66,7 +66,6 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
             {resource.category}
             {resource.standard ? ` · ${resource.standard}` : ""}
           </p>
-
           <span className="flex shrink-0 items-center gap-1 font-semibold text-blue-600 transition-all group-hover:gap-2">
             Open <ArrowRight size={16} />
           </span>

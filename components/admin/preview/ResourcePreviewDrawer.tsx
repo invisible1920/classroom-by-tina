@@ -76,11 +76,13 @@ export default function ResourcePreviewDrawer({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Stat title="Grade" value={resource.grade} />
-            <Stat title="Subject" value={resource.subject} />
-            <Stat title="Week" value={String(resource.week)} />
-            <Stat title="Category" value={resource.category} />
-          </div>
+  <Stat title="Grade" value={resource.grade} />
+  <Stat title="Subject" value={resource.subject} />
+  <Stat title="Month" value={resource.month} />
+  <Stat title="Week" value={`Week ${resource.week}`} />
+  <Stat title="Category" value={resource.category} />
+  <Stat title="Ability" value={resource.ability_group ?? "All"} />
+</div>
 
           {resource.pdf && (
             <a

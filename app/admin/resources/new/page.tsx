@@ -36,6 +36,22 @@ const categories: ResourceCategory[] = [
 
 const abilityGroups: AbilityGroup[] = ["All", "Low", "Medium", "High"];
 
+const months = [
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+];
+
+const weeks = [1, 2, 3, 4];
+
 async function createResourceAction(formData: FormData) {
   "use server";
 
@@ -43,7 +59,12 @@ async function createResourceAction(formData: FormData) {
   const description = String(formData.get("description") ?? "").trim();
   const grade = String(formData.get("grade") ?? "First Grade") as Grade;
   const subject = String(formData.get("subject") ?? "ELA") as Subject;
-  const week = Number(formData.get("week") ?? 1);
+  const month = String(formData.get("month") ?? "August").trim();
+const week = Number(formData.get("week") ?? 1);
+
+if (!weeks.includes(week)) {
+  throw new Error("Week must be between 1 and 4.");
+}
   const standard = String(formData.get("standard") ?? "").trim();
   const category = String(
     formData.get("category") ?? "Lesson Plan"
@@ -76,15 +97,16 @@ async function createResourceAction(formData: FormData) {
   description,
   grade,
   subject,
-  week: Number.isFinite(week) && week > 0 ? week : 1,
+  month,
+  week,
   standard,
   category,
- ability_group: abilityGroup,
+  ability_group: abilityGroup,
   featured,
-    status: "published",
-    thumbnail: thumbnailPath,
-    pdf: pdfPath,
-  });
+  status: "published",
+  thumbnail: thumbnailPath,
+  pdf: pdfPath,
+});
 
   revalidatePath("/admin/resources");
   revalidatePath("/dashboard");
@@ -182,71 +204,58 @@ export default function NewResourcePage() {
                 />
               </Field>
 
-              <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Grade">
-                  <select name="grade" className="admin-input">
-                    {grades.map((grade) => (
-                      <option key={grade} value={grade}>
-                        {grade}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
+             <div className="grid gap-5 md:grid-cols-2">
+  <Field label="Month">
+    <select name="month" defaultValue="August" className="admin-input">
+      {months.map((month) => (
+        <option key={month} value={month}>
+          {month}
+        </option>
+      ))}
+    </select>
+  </Field>
 
-                <Field label="Subject">
-                  <select name="subject" className="admin-input">
-                    {subjects.map((subject) => (
-                      <option key={subject} value={subject}>
-                        {subject}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-              </div>
+  <Field label="Week">
+    <select name="week" defaultValue="1" className="admin-input">
+      {weeks.map((week) => (
+        <option key={week} value={week}>
+          Week {week}
+        </option>
+      ))}
+    </select>
+  </Field>
+</div>
 
-              <div className="grid gap-5 md:grid-cols-4">
-                <Field label="Week">
-                  <input
-                    name="week"
-                    type="number"
-                    min="1"
-                    defaultValue="1"
-                    className="admin-input"
-                  />
-                </Field>
+<div className="grid gap-5 md:grid-cols-3">
+  <Field label="Standard">
+    <input
+      name="standard"
+      type="text"
+      placeholder="RL.1.2"
+      className="admin-input"
+    />
+  </Field>
 
-                <Field label="Standard">
-                  <input
-                    name="standard"
-                    type="text"
-                    placeholder="RL.1.2"
-                    className="admin-input"
-                  />
-                </Field>
+  <Field label="Category">
+    <select name="category" className="admin-input">
+      {categories.map((category) => (
+        <option key={category} value={category}>
+          {category}
+        </option>
+      ))}
+    </select>
+  </Field>
 
-                <Field label="Category">
-                  <select name="category" className="admin-input">
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-                <Field label="Ability Group">
-  <select
-    name="ability_group"
-    defaultValue="All"
-    className="admin-input"
-  >
-    {abilityGroups.map((group) => (
-      <option key={group} value={group}>
-        {group}
-      </option>
-    ))}
-  </select>
-</Field>
-              </div>
+  <Field label="Ability Group">
+    <select name="ability_group" defaultValue="All" className="admin-input">
+      {abilityGroups.map((group) => (
+        <option key={group} value={group}>
+          {group}
+        </option>
+      ))}
+    </select>
+  </Field>
+</div>
             </div>
           </section>
 

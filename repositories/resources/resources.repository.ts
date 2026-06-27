@@ -13,6 +13,7 @@ type SupabaseResource = {
   description: string | null;
   grade: Resource["grade"];
   subject: Resource["subject"];
+  month: string;
   week: number;
   standard: string | null;
   category: Resource["category"];
@@ -33,6 +34,7 @@ function mapResource(resource: SupabaseResource): Resource {
     description: resource.description ?? "",
     grade: resource.grade,
     subject: resource.subject,
+    month: resource.month,
     week: resource.week,
     standard: resource.standard ?? "",
     category: resource.category,
@@ -86,6 +88,7 @@ export async function createResourceInSupabase(
       description: input.description,
       grade: input.grade,
       subject: input.subject,
+      month: input.month,
       week: input.week,
       standard: input.standard,
       category: input.category,

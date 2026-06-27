@@ -4,6 +4,38 @@ import { notFound, redirect } from "next/navigation";
 import { getResource } from "@/services";
 import { createClient } from "@/utils/supabase/server";
 
+async function trackDownload(formData: FormData) {
+  "use server";
+
+  const resourceId = String(formData.get("resourceId") ?? "");
+  const resourceTitle = String(formData.get("resourceTitle") ?? "");
+  const pdfUrl = String(formData.get("pdfUrl") ?? "");
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  if (resourceId && resourceTitle) {
+    const { error } = await supabase.from("resource_downloads").insert({
+  user_id: user.id,
+  resource_id: resourceId,
+  resource_title: resourceTitle,
+});
+
+if (error) {
+  console.error("DOWNLOAD TRACKING ERROR:", error);
+}
+  }
+
+  redirect(pdfUrl);
+}
+
 export default async function ResourceDetailPage({
   params,
 }: {
@@ -62,7 +94,8 @@ export default async function ResourceDetailPage({
         <div className="p-10">
           <p className="text-sm font-semibold text-blue-600">
             {resource.grade} · {resource.subject}
-            {resource.week ? ` · Week ${resource.week}` : ""}
+{resource.month ? ` · ${resource.month}` : ""}
+{resource.week ? ` · Week ${resource.week}` : ""}
           </p>
 
           <h1 className="mt-4 text-4xl font-bold text-slate-900">
@@ -73,29 +106,30 @@ export default async function ResourceDetailPage({
             {resource.description}
           </p>
 
-          <div className="mt-8 grid gap-4 rounded-2xl bg-slate-50 p-6 sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 rounded-2xl bg-slate-50 p-6 sm:grid-cols-4">
             <div>
-              <p className="text-sm font-bold text-slate-500">
-                Resource Type
-              </p>
+              <p className="text-sm font-bold text-slate-500">Resource Type</p>
               <p className="mt-1 font-semibold text-slate-900">
                 {resource.category || "Not set"}
               </p>
             </div>
 
             <div>
-              <p className="text-sm font-bold text-slate-500">
-                Standard
-              </p>
+              <p className="text-sm font-bold text-slate-500">Standard</p>
               <p className="mt-1 font-semibold text-slate-900">
                 {resource.standard || "Not set"}
               </p>
             </div>
 
             <div>
-              <p className="text-sm font-bold text-slate-500">
-                Status
-              </p>
+  <p className="text-sm font-bold text-slate-500">Month / Week</p>
+  <p className="mt-1 font-semibold text-slate-900">
+    {resource.month} · Week {resource.week}
+  </p>
+</div>
+
+            <div>
+              <p className="text-sm font-bold text-slate-500">Status</p>
               <p className="mt-1 font-semibold capitalize text-slate-900">
                 {resource.status}
               </p>
@@ -104,14 +138,22 @@ export default async function ResourceDetailPage({
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             {resource.pdf ? (
-              <a
-                href={resource.pdf}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex rounded-xl bg-blue-600 px-8 py-4 font-semibold text-white hover:bg-blue-700"
-              >
-                Download Resource
-              </a>
+              <form action={trackDownload}>
+                <input type="hidden" name="resourceId" value={resource.id} />
+                <input
+                  type="hidden"
+                  name="resourceTitle"
+                  value={resource.title}
+                />
+                <input type="hidden" name="pdfUrl" value={resource.pdf} />
+
+                <button
+                  type="submit"
+                  className="inline-flex rounded-xl bg-blue-600 px-8 py-4 font-semibold text-white hover:bg-blue-700"
+                >
+                  Download Resource
+                </button>
+              </form>
             ) : (
               <button
                 disabled
@@ -122,11 +164,11 @@ export default async function ResourceDetailPage({
             )}
 
             <Link
-  href="/dashboard"
-  className="inline-flex rounded-xl border border-slate-200 px-8 py-4 font-semibold text-slate-700 hover:bg-slate-50"
->
-  ← Back to Dashboard
-</Link>
+              href="/dashboard"
+              className="inline-flex rounded-xl border border-slate-200 px-8 py-4 font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              ← Back to Dashboard
+            </Link>
           </div>
         </div>
       </section>

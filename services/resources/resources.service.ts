@@ -20,6 +20,7 @@ export type ResourceSortBy =
   | "title"
   | "grade"
   | "subject"
+  | "month"
   | "week"
   | "updatedAt";
 
@@ -29,6 +30,7 @@ export type GetResourcesOptions = {
   search?: string;
   grade?: Grade | "All Grades";
   subject?: Subject | "All Subjects";
+  month?: string;
   category?: ResourceCategory | "All Categories";
   ability_group?: AbilityGroup | "All Ability Groups";
   status?: ResourceStatus | "all";
@@ -56,6 +58,7 @@ export async function getResources(
     search = "",
     grade = "All Grades",
     subject = "All Subjects",
+    month = "All Months",
     category = "All Categories",
     ability_group = "All Ability Groups",
     status = "all",
@@ -76,6 +79,7 @@ export async function getResources(
         resource.description,
         resource.grade,
         resource.subject,
+        resource.month,
         resource.standard,
         resource.category,
         resource.ability_group,
@@ -89,6 +93,8 @@ export async function getResources(
 
     const matchesSubject =
       subject === "All Subjects" || resource.subject === subject;
+
+    const matchesMonth = month === "All Months" || resource.month === month;  
 
     const matchesCategory =
       category === "All Categories" || resource.category === category;
@@ -106,6 +112,7 @@ export async function getResources(
       matchesSearch &&
       matchesGrade &&
       matchesSubject &&
+      matchesMonth &&
       matchesCategory &&
       matchesAbilityGroup &&
       matchesStatus &&
@@ -193,6 +200,7 @@ export async function duplicateResource(id: string): Promise<Resource | null> {
     description: existing.description,
     grade: existing.grade,
     subject: existing.subject,
+    month: existing.month,
     week: existing.week,
     standard: existing.standard,
     category: existing.category,
