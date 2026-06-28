@@ -1,27 +1,18 @@
 import { redirect } from "next/navigation";
 
 import GradeResourceBrowser from "@/components/resources/GradeResourceBrowser";
+import { getCurrentUserAccess } from "@/lib/auth/get-current-user-access";
 import { getResources } from "@/services";
-import { createClient } from "@/utils/supabase/server";
+import { getFavoriteResourceIds } from "@/lib/favorites";
 
 export default async function FirstGradePage() {
-  const supabase = await createClient();
+  const access = await getCurrentUserAccess();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!access.userId) {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
 
-  const isAdmin = profile?.role === "admin";
 
   const resources = await getResources({
     grade: "First Grade",
@@ -29,21 +20,15 @@ export default async function FirstGradePage() {
     pageSize: 500,
   });
 
-  const { data: favorites } = await supabase
-    .from("resource_favorites")
-    .select("resource_id")
-    .eq("user_id", user.id);
-
-  const favoriteResourceIds =
-    favorites?.map((favorite) => favorite.resource_id) ?? [];
+  const favoriteResourceIds = await getFavoriteResourceIds(access.userId);
 
   return (
     <GradeResourceBrowser
-      key={`${isAdmin}-${favoriteResourceIds.join("-")}`}
+      key={`${access.isAdmin}-${favoriteResourceIds.join("-")}`}
       grade="First Grade"
       resources={resources.items}
       favoriteResourceIds={favoriteResourceIds}
-      isAdmin={isAdmin}
+      isAdmin={access.isAdmin}
     />
   );
 }

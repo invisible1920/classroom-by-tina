@@ -23,7 +23,7 @@ export default function Pricing() {
             Simple Pricing
           </p>
 
-          <h2 className="mt-4 text-5xl font-black tracking-tight text-[#1f2a44]">
+          <h2 className="mt-4 text-4xl font-black tracking-tight text-[#1f2a44] sm:text-5xl">
             One subscription.
             <br />
             Everything you need.
@@ -52,7 +52,7 @@ export default function Pricing() {
                 </h3>
 
                 <div className="mt-6 flex items-end gap-2">
-                  <span className="text-7xl font-black">$9</span>
+                  <span className="text-6xl font-black sm:text-7xl">$14.99</span>
                   <span className="pb-3 text-lg font-bold text-white/70">
                     /month
                   </span>

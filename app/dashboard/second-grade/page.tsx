@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 
 import GradeResourceBrowser from "@/components/resources/GradeResourceBrowser";
 import { getCurrentUserAccess } from "@/lib/auth/get-current-user-access";
+import { getFavoriteResourceIds } from "@/lib/favorites";
 import { getResources } from "@/services";
-import { createClient } from "@/utils/supabase/server";
 
 export default async function SecondGradePage() {
   const access = await getCurrentUserAccess();
@@ -12,21 +12,13 @@ export default async function SecondGradePage() {
     redirect("/login");
   }
 
-  const supabase = await createClient();
-
   const resources = await getResources({
     grade: "Second Grade",
     status: "published",
     pageSize: 500,
   });
 
-  const { data: favorites } = await supabase
-    .from("resource_favorites")
-    .select("resource_id")
-    .eq("user_id", access.userId);
-
-  const favoriteResourceIds =
-    favorites?.map((favorite) => favorite.resource_id) ?? [];
+  const favoriteResourceIds = await getFavoriteResourceIds(access.userId);
 
   return (
     <GradeResourceBrowser

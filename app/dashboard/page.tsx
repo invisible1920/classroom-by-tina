@@ -9,6 +9,7 @@ import ResourceCard from "@/components/resources/ResourceCard";
 import SectionTitle from "@/components/ui/SectionTitle";
 import { getResources } from "@/services";
 import { createClient } from "@/utils/supabase/server";
+import { getFavoriteResourceIds } from "@/lib/favorites";
 
 const gradeLinks = [
   {
@@ -65,14 +66,7 @@ export default async function DashboardPage() {
     pageSize: 3,
   });
 
-  const { data: favoriteRows } = await supabase
-  .from("resource_favorites")
-  .select("resource_id")
-  .eq("user_id", user.id);
-
-  const favoriteResourceIds = new Set(
-    (favoriteRows ?? []).map((favorite) => favorite.resource_id)
-  );
+  const favoriteResourceIds = new Set(await getFavoriteResourceIds(user.id));
 
   const recentResources = await getResources({
     status: "published",
@@ -197,8 +191,12 @@ export default async function DashboardPage() {
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           {recentResources.items.map((resource) => (
-            <ResourceCard key={resource.id} resource={resource} />
-          ))}
+  <ResourceCard
+    key={resource.id}
+    resource={resource}
+    isFavorite={favoriteResourceIds.has(resource.id)}
+  />
+))}
         </div>
       </section>
     </>
