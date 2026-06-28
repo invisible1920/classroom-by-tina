@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { BookOpen, Clock, Download, Star } from "lucide-react";
 
 import ContinueTeachingCard from "@/components/dashboard/ContinueTeachingCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -10,6 +9,9 @@ import SectionTitle from "@/components/ui/SectionTitle";
 import { getResources } from "@/services";
 import { createClient } from "@/utils/supabase/server";
 import { getFavoriteResourceIds } from "@/lib/favorites";
+
+import Link from "next/link";
+import { ArrowLeft, BookOpen, Clock, Download, Star } from "lucide-react";
 
 const gradeLinks = [
   {
@@ -110,8 +112,20 @@ export default async function DashboardPage() {
   
 
   return (
-    <>
-      <DashboardHeader name={displayName} />
+  <>
+    {profile.role === "admin" && (
+      <div className="mb-6 flex justify-end">
+        <Link
+          href="/admin"
+          className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-700 shadow-sm transition hover:border-blue-600 hover:text-blue-600"
+        >
+          <ArrowLeft size={18} />
+          Back to Admin
+        </Link>
+      </div>
+    )}
+
+    <DashboardHeader name={displayName} />
 
       <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatsCard
