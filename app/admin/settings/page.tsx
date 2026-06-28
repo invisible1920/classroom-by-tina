@@ -129,7 +129,7 @@ export default function SettingsPage() {
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
               <SettingField label="Brand Name" value="Classroom by Tina" />
-              <SettingField label="Admin Label" value="Tina Control Center" />
+              <SettingField label="Admin Label" value="Admin Dashboard" />
               <SettingField label="Primary Color" value="#1f2a44" />
               <SettingField label="Accent Color" value="#f5b942" />
             </div>

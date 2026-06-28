@@ -65,7 +65,7 @@ export default async function DashboardPage() {
   const featuredResources = await getResources({
     featured: true,
     status: "published",
-    pageSize: 3,
+    pageSize: 5,
   });
 
   const favoriteResourceIds = new Set(await getFavoriteResourceIds(user.id));
@@ -74,7 +74,7 @@ export default async function DashboardPage() {
     status: "published",
     sortBy: "updatedAt",
     sortOrder: "desc",
-    pageSize: 3,
+    pageSize: 5,
   });
 
   const thirtyDaysAgo = new Date(
@@ -109,23 +109,22 @@ export default async function DashboardPage() {
       .eq("status", "published")
       .gte("created_at", thirtyDaysAgo),
   ]);
-  
 
   return (
-  <>
-    {profile.role === "admin" && (
-      <div className="mb-6 flex justify-end">
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-700 shadow-sm transition hover:border-blue-600 hover:text-blue-600"
-        >
-          <ArrowLeft size={18} />
-          Back to Admin
-        </Link>
-      </div>
-    )}
+    <>
+      {profile.role === "admin" && (
+        <div className="mb-6 flex justify-end">
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-700 shadow-sm transition hover:border-blue-600 hover:text-blue-600"
+          >
+            <ArrowLeft size={18} />
+            Back to Admin
+          </Link>
+        </div>
+      )}
 
-    <DashboardHeader name={displayName} />
+      <DashboardHeader name={displayName} />
 
       <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatsCard
@@ -185,14 +184,14 @@ export default async function DashboardPage() {
           description="High-priority resources selected for teachers to see first."
         />
 
-        <div className="mt-6 grid gap-6 md:grid-cols-3">
-          {recentResources.items.map((resource) => (
-  <ResourceCard
-    key={resource.id}
-    resource={resource}
-    isFavorite={favoriteResourceIds.has(resource.id)}
-  />
-))}
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {featuredResources.items.map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              resource={resource}
+              isFavorite={favoriteResourceIds.has(resource.id)}
+            />
+          ))}
         </div>
       </section>
 
@@ -203,14 +202,14 @@ export default async function DashboardPage() {
           description="Freshly added resources for planning, centers, and classroom instruction."
         />
 
-        <div className="mt-6 grid gap-6 md:grid-cols-3">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {recentResources.items.map((resource) => (
-  <ResourceCard
-    key={resource.id}
-    resource={resource}
-    isFavorite={favoriteResourceIds.has(resource.id)}
-  />
-))}
+            <ResourceCard
+              key={resource.id}
+              resource={resource}
+              isFavorite={favoriteResourceIds.has(resource.id)}
+            />
+          ))}
         </div>
       </section>
     </>

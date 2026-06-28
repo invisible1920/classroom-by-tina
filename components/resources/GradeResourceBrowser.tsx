@@ -130,7 +130,7 @@ export default function GradeResourceBrowser({
         </div>
       </div>
 
-      <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
@@ -138,16 +138,16 @@ export default function GradeResourceBrowser({
           className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
         />
 
-        <div className="mt-6">
+        <div className="mt-5">
           <p className="mb-3 font-semibold text-slate-900">Subject</p>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {subjects.map((subject) => (
               <button
                 key={subject}
                 type="button"
                 onClick={() => setSelectedSubject(subject)}
-                className={`rounded-full px-5 py-2 font-medium ${
+                className={`rounded-full px-4 py-2 text-sm font-medium ${
                   selectedSubject === subject
                     ? "bg-blue-600 text-white"
                     : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
@@ -160,16 +160,16 @@ export default function GradeResourceBrowser({
         </div>
 
         {isAdmin && (
-          <div className="mt-6">
+          <div className="mt-5">
             <p className="mb-3 font-semibold text-slate-900">Month</p>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {months.map((month) => (
                 <button
                   key={month}
                   type="button"
                   onClick={() => setSelectedMonth(month)}
-                  className={`rounded-full px-5 py-2 font-medium ${
+                  className={`rounded-full px-4 py-2 text-sm font-medium ${
                     selectedMonth === month
                       ? "bg-[#1f2a44] text-white"
                       : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
@@ -182,16 +182,16 @@ export default function GradeResourceBrowser({
           </div>
         )}
 
-        <div className="mt-6">
+        <div className="mt-5">
           <p className="mb-3 font-semibold text-slate-900">Week</p>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {weeks.map((week) => (
               <button
                 key={week}
                 type="button"
                 onClick={() => setSelectedWeek(week)}
-                className={`rounded-full px-5 py-2 font-medium ${
+                className={`rounded-full px-4 py-2 text-sm font-medium ${
                   selectedWeek === week
                     ? "bg-slate-900 text-white"
                     : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
@@ -203,16 +203,16 @@ export default function GradeResourceBrowser({
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-5">
           <p className="mb-3 font-semibold text-slate-900">Ability Group</p>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {abilityGroups.map((group) => (
               <button
                 key={group}
                 type="button"
                 onClick={() => setSelectedAbilityGroup(group)}
-                className={`rounded-full px-5 py-2 font-medium ${
+                className={`rounded-full px-4 py-2 text-sm font-medium ${
                   selectedAbilityGroup === group
                     ? "bg-emerald-600 text-white"
                     : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
@@ -225,7 +225,7 @@ export default function GradeResourceBrowser({
         </div>
       </div>
 
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {filteredResources.length > 0 ? (
           filteredResources.map((resource) => (
             <ResourceCard

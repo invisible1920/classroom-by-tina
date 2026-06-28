@@ -9,6 +9,10 @@ import {
   Download,
   Receipt,
   Activity,
+  RefreshCw,
+  AlertCircle,
+  PauseCircle,
+  XCircle,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 
@@ -22,7 +26,18 @@ export default async function TeacherDetailPage({
 
   const { data: teacher, error } = await supabase
     .from("profiles")
-    .select("id, full_name, email, role, subscription_status, created_at")
+    .select(`
+      id,
+      full_name,
+      email,
+      role,
+      subscription_status,
+      stripe_customer_id,
+      stripe_subscription_id,
+      stripe_price_id,
+      stripe_current_period_end,
+      created_at
+    `)
     .eq("id", id)
     .maybeSingle();
 
@@ -37,7 +52,22 @@ export default async function TeacherDetailPage({
     .order("downloaded_at", { ascending: false })
     .limit(10);
 
+  const { count: downloadsThisMonth } = await supabase
+    .from("resource_downloads")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", id)
+    .gte("downloaded_at", getStartOfMonthIso());
+
+  const { count: favoriteCount } = await supabase
+    .from("favorites")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", id);
+
   const lastDownload = downloads?.[0]?.downloaded_at;
+  const subscription = getSubscriptionDisplay(
+    teacher.subscription_status,
+    teacher.stripe_current_period_end
+  );
 
   return (
     <main className="min-h-screen bg-[#fff8f0] px-6 py-10">
@@ -67,7 +97,7 @@ export default async function TeacherDetailPage({
           <InfoCard
             icon={<Crown size={22} />}
             label="Plan"
-            value={teacher.subscription_status ?? "free"}
+            value={subscription.label}
           />
 
           <InfoCard
@@ -80,9 +110,7 @@ export default async function TeacherDetailPage({
             icon={<BadgeCheck size={22} />}
             label="Last Download"
             value={
-              lastDownload
-                ? new Date(lastDownload).toLocaleDateString()
-                : "None"
+              lastDownload ? new Date(lastDownload).toLocaleDateString() : "None"
             }
           />
 
@@ -124,19 +152,78 @@ export default async function TeacherDetailPage({
             )}
           </Panel>
 
-          <Panel title="Purchases / Subscription" icon={<Receipt size={22} />}>
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-xs font-black uppercase tracking-widest text-slate-400">
-                Current Plan
-              </p>
-              <p className="mt-2 text-xl font-black uppercase text-[#1f2a44]">
-                {teacher.subscription_status ?? "free"}
+          <Panel title="Subscription" icon={<Receipt size={22} />}>
+            <div className="rounded-[1.5rem] bg-slate-50 p-5">
+              <div className="flex items-center gap-3">
+                <div className={subscription.badgeClass}>{subscription.icon}</div>
+
+                <div>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+                    Current Status
+                  </p>
+                  <p className="mt-1 text-2xl font-black text-[#1f2a44]">
+                    {subscription.label}
+                  </p>
+                </div>
+              </div>
+
+              <p className="mt-4 text-sm font-bold text-slate-500">
+                {subscription.description}
               </p>
             </div>
 
-            <p className="mt-4 text-slate-500">
-              Stripe purchase history can be connected here next.
-            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <SubscriptionStat
+                label="Renews / Ends"
+                value={
+                  teacher.stripe_current_period_end
+                    ? new Date(
+                        teacher.stripe_current_period_end
+                      ).toLocaleDateString()
+                    : "Not available"
+                }
+              />
+
+              <SubscriptionStat
+                label="Days Remaining"
+                value={
+                  teacher.stripe_current_period_end
+                    ? String(getDaysRemaining(teacher.stripe_current_period_end))
+                    : "N/A"
+                }
+              />
+
+              <SubscriptionStat
+                label="Downloads This Month"
+                value={String(downloadsThisMonth ?? 0)}
+              />
+
+              <SubscriptionStat
+                label="Favorite Resources"
+                value={String(favoriteCount ?? 0)}
+              />
+            </div>
+
+            <details className="mt-5 rounded-2xl border border-slate-100 bg-white p-4">
+              <summary className="cursor-pointer text-sm font-black text-slate-500">
+                Developer Stripe Info
+              </summary>
+
+              <div className="mt-4 space-y-3">
+                <DeveloperInfo
+                  label="Customer ID"
+                  value={teacher.stripe_customer_id ?? "Not connected"}
+                />
+                <DeveloperInfo
+                  label="Subscription ID"
+                  value={teacher.stripe_subscription_id ?? "No subscription"}
+                />
+                <DeveloperInfo
+                  label="Price ID"
+                  value={teacher.stripe_price_id ?? "No price"}
+                />
+              </div>
+            </details>
           </Panel>
 
           <Panel title="Activity" icon={<Activity size={22} />}>
@@ -220,6 +307,28 @@ function Panel({
   );
 }
 
+function SubscriptionStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-slate-50 p-4">
+      <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+        {label}
+      </p>
+      <p className="mt-2 text-lg font-black text-[#1f2a44]">{value}</p>
+    </div>
+  );
+}
+
+function DeveloperInfo({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+        {label}
+      </p>
+      <p className="mt-1 break-all text-sm font-bold text-slate-600">{value}</p>
+    </div>
+  );
+}
+
 function ActivityItem({ title, date }: { title: string; date: string }) {
   return (
     <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
@@ -244,4 +353,83 @@ function getInitials(value: string) {
     .join("")
     .slice(0, 2)
     .toUpperCase();
+}
+
+function getStartOfMonthIso() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+}
+
+function getDaysRemaining(date: string) {
+  const end = new Date(date).getTime();
+  const now = new Date().getTime();
+  return Math.max(0, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
+}
+
+function getSubscriptionDisplay(
+  status?: string | null,
+  currentPeriodEnd?: string | null
+) {
+  const normalized = status ?? "inactive";
+  const daysRemaining = currentPeriodEnd
+    ? getDaysRemaining(currentPeriodEnd)
+    : null;
+
+  if (normalized === "pro") {
+    return {
+      label: "Active Pro",
+      description:
+        daysRemaining !== null
+          ? `This teacher has active access. Renewal is in ${daysRemaining} day${
+              daysRemaining === 1 ? "" : "s"
+            }.`
+          : "This teacher has active access.",
+      icon: <BadgeCheck size={22} />,
+      badgeClass:
+        "flex h-11 w-11 items-center justify-center rounded-full bg-green-100 text-green-700",
+    };
+  }
+
+  if (normalized === "canceling") {
+    return {
+      label: "Canceling",
+      description:
+        daysRemaining !== null
+          ? `Access remains active for ${daysRemaining} day${
+              daysRemaining === 1 ? "" : "s"
+            }, then ends.`
+          : "This subscription is scheduled to cancel.",
+      icon: <AlertCircle size={22} />,
+      badgeClass:
+        "flex h-11 w-11 items-center justify-center rounded-full bg-amber-100 text-amber-700",
+    };
+  }
+
+  if (normalized === "paused") {
+    return {
+      label: "Paused",
+      description: "This subscription is paused and may not have active access.",
+      icon: <PauseCircle size={22} />,
+      badgeClass:
+        "flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-blue-700",
+    };
+  }
+
+  if (normalized === "canceled") {
+    return {
+      label: "Canceled",
+      description: "This teacher canceled their subscription.",
+      icon: <XCircle size={22} />,
+      badgeClass:
+        "flex h-11 w-11 items-center justify-center rounded-full bg-red-100 text-red-700",
+    };
+  }
+
+  return {
+    label: "Inactive",
+    description: "This teacher does not currently have an active subscription.",
+    icon: <RefreshCw size={22} />,
+    badgeClass:
+      "flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-slate-600",
+  };
 }

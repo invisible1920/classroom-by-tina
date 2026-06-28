@@ -4,6 +4,7 @@ import { Download } from "lucide-react";
 import ResourceCard from "@/components/resources/ResourceCard";
 import { createClient } from "@/utils/supabase/server";
 import { getResources } from "@/services";
+import { getFavoriteResourceIds } from "@/lib/favorites";
 
 export default async function DownloadsPage() {
   const supabase = await createClient();
@@ -26,6 +27,8 @@ export default async function DownloadsPage() {
     throw new Error(error.message);
   }
 
+  const favoriteResourceIds = new Set(await getFavoriteResourceIds(user.id));
+
   const downloadedIds = [
     ...new Set((downloads ?? []).map((download) => download.resource_id)),
   ];
@@ -37,7 +40,9 @@ export default async function DownloadsPage() {
 
   const downloadedResources = downloadedIds
     .map((id) => resources.items.find((resource) => resource.id === id))
-    .filter((resource): resource is NonNullable<typeof resource> => Boolean(resource));
+    .filter((resource): resource is NonNullable<typeof resource> =>
+      Boolean(resource)
+    );
 
   return (
     <main>
@@ -47,9 +52,7 @@ export default async function DownloadsPage() {
         </div>
 
         <div>
-          <h1 className="text-4xl font-black text-slate-900">
-            My Downloads
-          </h1>
+          <h1 className="text-4xl font-black text-slate-900">My Downloads</h1>
 
           <p className="mt-2 text-lg text-slate-600">
             Every resource you&apos;ve downloaded is saved here for quick access.
@@ -78,9 +81,13 @@ export default async function DownloadsPage() {
           </p>
         </div>
       ) : (
-        <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {downloadedResources.map((resource) => (
-            <ResourceCard key={resource.id} resource={resource} />
+            <ResourceCard
+              key={resource.id}
+              resource={resource}
+              isFavorite={favoriteResourceIds.has(resource.id)}
+            />
           ))}
         </div>
       )}

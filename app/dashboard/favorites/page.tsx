@@ -59,16 +59,14 @@ export default async function FavoritesPage() {
       </section>
 
       {resources.length > 0 ? (
-        <section className="mt-8 grid gap-6 md:grid-cols-3">
-          {resources.map((resource) => (
-            <ResourceCard
-              key={resource.id}
-              resource={resource}
-              isFavorite
-            />
-          ))}
-        </section>
-      ) : (
+  <section className="mt-8">
+    <div className="grid max-w-7xl gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      {resources.map((resource) => (
+        <ResourceCard key={resource.id} resource={resource} isFavorite />
+      ))}
+    </div>
+  </section>
+) : (
         <section className="mt-8 rounded-[2rem] border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose-50 text-rose-500">
             <Heart size={30} />
