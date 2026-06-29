@@ -1,49 +1,90 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, Clock } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Clock,
+  Sparkles,
+} from "lucide-react";
 
 import { buttonStyles } from "@/components/ui/Button";
 
 export default function ContinueTeachingCard() {
   return (
-    <section className="mt-10 overflow-hidden rounded-3xl border border-blue-100 bg-blue-600 p-8 text-white shadow-sm">
-      <div className="flex flex-col justify-between gap-8 md:flex-row md:items-center">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-white/15 p-3">
-              <BookOpen size={24} />
-            </div>
-
-            <p className="font-semibold uppercase tracking-widest text-blue-100">
-              Continue Teaching
-            </p>
+    <section className="mt-10 overflow-hidden rounded-[2rem] bg-gradient-to-r from-[#35c6c9] to-[#2aaeb0] p-8 text-white shadow-xl">
+      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
+        <div className="max-w-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-black">
+            <Sparkles size={16} />
+            Continue Teaching 🍎
           </div>
 
-          <h2 className="mt-6 text-3xl font-bold tracking-tight">
-            First Grade ELA · Week 1
+          <h2 className="mt-6 text-4xl font-black leading-tight">
+            First Grade ELA
+            <br />
+            Week 1
           </h2>
 
-          <p className="mt-3 max-w-xl text-blue-100">
-            Pick up with short vowels, sight words, centers, and weekly
-            assessment resources.
+          <p className="mt-4 text-lg leading-8 text-white/90">
+            Jump back into short vowels, sight words, literacy centers,
+            assessments, and classroom activities for this week's lessons.
           </p>
 
-          <div className="mt-6 flex items-center gap-2 text-sm font-medium text-blue-100">
-            <Clock size={16} />
-            Estimated planning time: 12 minutes
+          <div className="mt-8">
+            <div className="flex items-center justify-between text-sm font-bold">
+              <span>Week Ready</span>
+              <span>72%</span>
+            </div>
+
+            <div className="mt-2 h-3 overflow-hidden rounded-full bg-white/25">
+              <div className="h-full w-[72%] rounded-full bg-[#ffd54a]" />
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-6 text-sm font-bold text-white/90">
+            <div className="flex items-center gap-2">
+              <BookOpen size={17} />
+              18 Resources
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Clock size={17} />
+              12 min planning
+            </div>
           </div>
         </div>
 
-        <Link
-          href="/dashboard/first-grade"
-          className={buttonStyles({
-            variant: "white",
-            size: "lg",
-            className: "shrink-0",
-          })}
-        >
-          Continue
-          <ArrowRight size={18} />
-        </Link>
+        <div className="shrink-0">
+          <Link
+            href="/dashboard/first-grade"
+            className={buttonStyles({
+              variant: "white",
+              size: "lg",
+              className:
+                "rounded-full px-8 shadow-xl hover:scale-105 transition",
+            })}
+          >
+            Continue Teaching
+            <ArrowRight size={18} />
+          </Link>
+        </div>
+      </div>
+
+      <div className="mt-8 flex flex-wrap gap-3">
+        <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
+          📚 Lesson Plans
+        </span>
+
+        <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
+          🎲 Centers
+        </span>
+
+        <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
+          📝 Assessment
+        </span>
+
+        <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
+          💌 Parent Letter
+        </span>
       </div>
     </section>
   );

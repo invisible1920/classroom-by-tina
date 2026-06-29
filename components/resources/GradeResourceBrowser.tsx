@@ -105,125 +105,87 @@ export default function GradeResourceBrowser({
 
   return (
     <main>
-      <a href="/dashboard" className="text-blue-600 hover:underline">
+      <a
+        href="/dashboard"
+        className="inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-[#35c6c9] shadow-sm transition hover:bg-[#e8fbfb]"
+      >
         ← Back to Dashboard
       </a>
 
-      <div className="mt-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900">{grade}</h1>
-
-          <p className="mt-3 text-lg text-slate-600">
-            Browse resources by subject, week, standard, skill, and ability
-            group.
-          </p>
-
-          {!isAdmin && (
-            <p className="mt-2 text-sm font-semibold text-slate-500">
-              Currently showing: {activeMonths || "current month"}
+      <section className="mt-8 overflow-hidden rounded-[2rem] border border-[#ffe7b5] bg-white p-8 shadow-sm">
+        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <p className="text-sm font-black uppercase tracking-widest text-[#ff8a3d]">
+              CMS Teaching Library 🍎
             </p>
-          )}
-        </div>
 
-        <div className="rounded-xl bg-white px-4 py-3 font-semibold text-slate-700 shadow-sm">
-          {filteredResources.length} resources
-        </div>
-      </div>
+            <h1 className="mt-3 text-4xl font-black tracking-tight text-[#17223b]">
+              {grade}
+            </h1>
 
-      <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="mt-3 max-w-2xl text-lg leading-8 text-slate-600">
+              Browse Charlotte-Mecklenburg resources by subject, week, standard,
+              skill, and ability group.
+            </p>
+
+            {!isAdmin && (
+              <p className="mt-2 text-sm font-bold text-slate-500">
+                Currently showing: {activeMonths || "current month"}
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-full bg-[#35c6c9]/10 px-5 py-3 font-black text-[#35c6c9]">
+            {filteredResources.length} resources
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-8 rounded-[2rem] border border-[#ffe7b5] bg-white p-5 shadow-sm">
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search by skill, title, standard, or ability group..."
-          className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+          className="w-full rounded-2xl border border-[#ffe7b5] bg-[#fffaf3] px-4 py-3 font-semibold text-[#17223b] outline-none transition placeholder:text-slate-400 focus:border-[#35c6c9] focus:bg-white"
         />
 
-        <div className="mt-5">
-          <p className="mb-3 font-semibold text-slate-900">Subject</p>
-
-          <div className="flex flex-wrap gap-2">
-            {subjects.map((subject) => (
-              <button
-                key={subject}
-                type="button"
-                onClick={() => setSelectedSubject(subject)}
-                className={`rounded-full px-4 py-2 text-sm font-medium ${
-                  selectedSubject === subject
-                    ? "bg-blue-600 text-white"
-                    : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                {subject}
-              </button>
-            ))}
-          </div>
-        </div>
+        <FilterGroup
+          title="Subject"
+          items={subjects}
+          selected={selectedSubject}
+          onSelect={setSelectedSubject}
+          activeClass="bg-[#35c6c9] text-white border-[#35c6c9]"
+        />
 
         {isAdmin && (
-          <div className="mt-5">
-            <p className="mb-3 font-semibold text-slate-900">Month</p>
-
-            <div className="flex flex-wrap gap-2">
-              {months.map((month) => (
-                <button
-                  key={month}
-                  type="button"
-                  onClick={() => setSelectedMonth(month)}
-                  className={`rounded-full px-4 py-2 text-sm font-medium ${
-                    selectedMonth === month
-                      ? "bg-[#1f2a44] text-white"
-                      : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
-                  }`}
-                >
-                  {month === "All" ? "All Months" : month}
-                </button>
-              ))}
-            </div>
-          </div>
+          <FilterGroup
+            title="Month"
+            items={months}
+            selected={selectedMonth}
+            onSelect={setSelectedMonth}
+            activeClass="bg-[#ff8a3d] text-white border-[#ff8a3d]"
+            formatLabel={(month) => (month === "All" ? "All Months" : String(month))}
+          />
         )}
 
-        <div className="mt-5">
-          <p className="mb-3 font-semibold text-slate-900">Week</p>
+        <FilterGroup
+          title="Week"
+          items={weeks}
+          selected={selectedWeek}
+          onSelect={setSelectedWeek}
+          activeClass="bg-[#f7b928] text-[#17223b] border-[#f7b928]"
+          formatLabel={(week) => (week === "All" ? "All Weeks" : `Week ${week}`)}
+        />
 
-          <div className="flex flex-wrap gap-2">
-            {weeks.map((week) => (
-              <button
-                key={week}
-                type="button"
-                onClick={() => setSelectedWeek(week)}
-                className={`rounded-full px-4 py-2 text-sm font-medium ${
-                  selectedWeek === week
-                    ? "bg-slate-900 text-white"
-                    : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                {week === "All" ? "All Weeks" : `Week ${week}`}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-5">
-          <p className="mb-3 font-semibold text-slate-900">Ability Group</p>
-
-          <div className="flex flex-wrap gap-2">
-            {abilityGroups.map((group) => (
-              <button
-                key={group}
-                type="button"
-                onClick={() => setSelectedAbilityGroup(group)}
-                className={`rounded-full px-4 py-2 text-sm font-medium ${
-                  selectedAbilityGroup === group
-                    ? "bg-emerald-600 text-white"
-                    : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                {group === "All" ? "All Groups" : group}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+        <FilterGroup
+          title="Ability Group"
+          items={abilityGroups}
+          selected={selectedAbilityGroup}
+          onSelect={setSelectedAbilityGroup}
+          activeClass="bg-[#7ac943] text-white border-[#7ac943]"
+          formatLabel={(group) => (group === "All" ? "All Groups" : String(group))}
+        />
+      </section>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {filteredResources.length > 0 ? (
@@ -235,10 +197,15 @@ export default function GradeResourceBrowser({
             />
           ))
         ) : (
-          <div className="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
-            <h2 className="text-2xl font-bold text-slate-900">
+          <div className="col-span-full rounded-[2rem] border border-dashed border-[#ffe7b5] bg-white p-12 text-center shadow-sm">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff3c4] text-2xl">
+              🔎
+            </div>
+
+            <h2 className="mt-5 text-2xl font-black text-[#17223b]">
               No resources found
             </h2>
+
             <p className="mt-3 text-slate-600">
               Try changing the subject, week, ability group, or search term.
             </p>
@@ -246,5 +213,48 @@ export default function GradeResourceBrowser({
         )}
       </div>
     </main>
+  );
+}
+
+function FilterGroup<T extends string | number>({
+  title,
+  items,
+  selected,
+  onSelect,
+  activeClass,
+  formatLabel,
+}: {
+  title: string;
+  items: T[];
+  selected: T;
+  onSelect: (value: T) => void;
+  activeClass: string;
+  formatLabel?: (value: T) => string;
+}) {
+  return (
+    <div className="mt-5">
+      <p className="mb-3 font-black text-[#17223b]">{title}</p>
+
+      <div className="flex flex-wrap gap-2">
+        {items.map((item) => {
+          const isActive = selected === item;
+
+          return (
+            <button
+              key={item}
+              type="button"
+              onClick={() => onSelect(item)}
+              className={`rounded-full border px-4 py-2 text-sm font-black transition hover:-translate-y-0.5 ${
+                isActive
+                  ? activeClass
+                  : "border-[#ffe7b5] bg-white text-slate-600 hover:bg-[#fff3c4] hover:text-[#17223b]"
+              }`}
+            >
+              {formatLabel ? formatLabel(item) : item}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
