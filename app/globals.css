@@ -1,15 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fff8f0;
-  --foreground: #1f2a44;
+  --background: #fffaf3;
+  --foreground: #17223b;
 
-  --brand-cream: #fff8f0;
-  --brand-navy: #1f2a44;
-  --brand-blue: #3b82f6;
-  --brand-gold: #f5b942;
-  --brand-green: #22c55e;
-  --brand-coral: #fb7185;
+  --brand-cream: #fffaf3;
+  --brand-navy: #17223b;
+
+  --brand-teal: #35c6c9;
+  --brand-yellow: #f7b928;
+  --brand-coral: #ff6f91;
+  --brand-purple: #a66dd4;
+  --brand-orange: #ff8a3d;
+  --brand-blue: #4f8cff;
+  --brand-green: #7ac943;
 }
 
 @theme inline {
@@ -36,8 +40,8 @@ body {
 }
 
 ::selection {
-  background: var(--brand-gold);
-  color: var(--brand-navy);
+  background: var(--brand-teal);
+  color: white;
 }
 
 .admin-input {
@@ -59,8 +63,8 @@ body {
 }
 
 .admin-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14);
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 4px rgba(53, 198, 201, 0.18);
 }
 
 html,

@@ -1,7 +1,6 @@
 import Navbar from "../components/home/Navbar";
 import Hero from "../components/home/Hero";
 import Features from "../components/home/Features";
-import DashboardPreview from "../components/home/DashboardPreview";
 import About from "../components/home/About";
 import Pricing from "../components/home/Pricing";
 import FinalCTA from "../components/home/FinalCTA";
@@ -13,7 +12,6 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Features />
-      <DashboardPreview />
       <About />
       <Pricing />
       <FinalCTA />
