@@ -4,9 +4,9 @@ import Link from "next/link";
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#ffe7b5] bg-[#fffaf3]/95 backdrop-blur-xl">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="relative h-14 w-14 shrink-0">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
+        <Link href="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <div className="relative h-11 w-11 shrink-0 sm:h-14 sm:w-14">
             <Image
               src="/images/logo.png"
               alt="Classroom by Tina"
@@ -17,8 +17,8 @@ export default function Navbar() {
             />
           </div>
 
-          <div>
-            <p className="text-lg font-black tracking-tight text-[#17223b]">
+          <div className="min-w-0">
+            <p className="truncate text-base font-black tracking-tight text-[#17223b] sm:text-lg">
               Classroom by Tina
             </p>
             <p className="hidden text-sm font-bold text-[#ff8a3d] sm:block">
@@ -39,7 +39,7 @@ export default function Navbar() {
           </a>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             href="/login"
             className="hidden rounded-full px-5 py-2.5 text-sm font-black text-[#17223b] hover:bg-white sm:inline-flex"
@@ -49,7 +49,7 @@ export default function Navbar() {
 
           <Link
             href="/signup"
-            className="rounded-full bg-[#17223b] px-5 py-2.5 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#35c6c9]"
+            className="rounded-full bg-[#17223b] px-4 py-2.5 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#35c6c9] sm:px-5"
           >
             Sign up
           </Link>
