@@ -77,13 +77,13 @@ const features = [
     soft: "bg-[#4f8cff]/12",
   },
   {
-    title: "AI Tools Soon",
-    description: "Create worksheets, quizzes, parent letters, and more.",
-    icon: Bot,
-    emoji: "✨",
-    color: "bg-[#35c6c9]",
-    soft: "bg-[#35c6c9]/10",
-  },
+  title: "AI Teaching Tools",
+  description: "Create worksheets, quizzes, parent letters, and more.",
+  icon: Bot,
+  emoji: "✨",
+  color: "bg-[#35c6c9]",
+  soft: "bg-[#35c6c9]/10",
+},
 ];
 
 const steps = [

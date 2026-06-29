@@ -1,14 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  BookOpen,
-  Download,
-  Heart,
-  Home,
-  LogOut,
-  Settings,
-  Sparkles,
-} from "lucide-react";
 
 import { signOut } from "@/app/actions/auth";
 
@@ -18,14 +9,14 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const grades = [
-    { label: "Kindergarten", href: "/dashboard/kindergarten", icon: Sparkles, emoji: "✨" },
-    { label: "First Grade", href: "/dashboard/first-grade", icon: BookOpen, emoji: "📚" },
-    { label: "Second Grade", href: "/dashboard/second-grade", icon: BookOpen, emoji: "⭐" },
+    { label: "Kindergarten", href: "/dashboard/kindergarten", emoji: "✨" },
+    { label: "First Grade", href: "/dashboard/first-grade", emoji: "📚" },
+    { label: "Second Grade", href: "/dashboard/second-grade", emoji: "⭐" },
   ];
 
   const resources = [
-    { label: "Favorites", href: "/dashboard/favorites", icon: Heart, emoji: "💛" },
-    { label: "Downloads", href: "/dashboard/downloads", icon: Download, emoji: "📥" },
+    { label: "Favorites", href: "/dashboard/favorites", emoji: "💛" },
+    { label: "Downloads", href: "/dashboard/downloads", emoji: "📥" },
   ];
 
   return (
@@ -63,8 +54,7 @@ export default function DashboardLayout({
               href="/dashboard"
               className="mt-3 flex items-center gap-3 rounded-2xl bg-[#35c6c9]/12 px-4 py-3 font-black text-[#35c6c9]"
             >
-              <span className="text-lg">🏠</span>
-              <Home size={19} />
+              <span className="w-6 text-lg">🏠</span>
               Dashboard
             </Link>
           </div>
@@ -75,21 +65,16 @@ export default function DashboardLayout({
             </p>
 
             <div className="mt-3 space-y-2">
-              {grades.map((item) => {
-                const Icon = item.icon;
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="flex items-center gap-3 rounded-2xl px-4 py-3 font-bold text-slate-600 transition hover:bg-[#fff3c4] hover:text-[#17223b]"
-                  >
-                    <span className="text-lg">{item.emoji}</span>
-                    <Icon size={19} />
-                    {item.label}
-                  </Link>
-                );
-              })}
+              {grades.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-3 rounded-2xl px-4 py-3 font-bold text-slate-600 transition hover:bg-[#fff3c4] hover:text-[#17223b]"
+                >
+                  <span className="w-6 text-lg">{item.emoji}</span>
+                  {item.label}
+                </Link>
+              ))}
             </div>
           </div>
 
@@ -99,21 +84,16 @@ export default function DashboardLayout({
             </p>
 
             <div className="mt-3 space-y-2">
-              {resources.map((item) => {
-                const Icon = item.icon;
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="flex items-center gap-3 rounded-2xl px-4 py-3 font-bold text-slate-600 transition hover:bg-[#ffeaf0] hover:text-[#17223b]"
-                  >
-                    <span className="text-lg">{item.emoji}</span>
-                    <Icon size={19} />
-                    {item.label}
-                  </Link>
-                );
-              })}
+              {resources.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-3 rounded-2xl px-4 py-3 font-bold text-slate-600 transition hover:bg-[#ffeaf0] hover:text-[#17223b]"
+                >
+                  <span className="w-6 text-lg">{item.emoji}</span>
+                  {item.label}
+                </Link>
+              ))}
             </div>
           </div>
 
@@ -126,8 +106,7 @@ export default function DashboardLayout({
               href="/dashboard/account"
               className="mt-3 flex items-center gap-3 rounded-2xl px-4 py-3 font-bold text-slate-600 transition hover:bg-[#e8fbfb] hover:text-[#17223b]"
             >
-              <span className="text-lg">⚙️</span>
-              <Settings size={19} />
+              <span className="w-6 text-lg">⚙️</span>
               Account
             </Link>
           </div>
@@ -138,8 +117,7 @@ export default function DashboardLayout({
             type="submit"
             className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 font-bold text-slate-600 transition hover:bg-[#ff6f91]/10 hover:text-[#ff6f91]"
           >
-            <span className="text-lg">👋</span>
-            <LogOut size={19} />
+            <span className="w-6 text-lg">👋</span>
             Sign Out
           </button>
         </form>

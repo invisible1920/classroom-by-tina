@@ -129,9 +129,9 @@ export default function MarketingDashboardMockup() {
                 </p>
 
                 <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#ff6f91]/10 px-4 py-2 text-sm font-black text-[#ff6f91]">
-                  <Sparkles size={15} />
-                  Coming soon
-                </div>
+  <Sparkles size={15} />
+  AI Tool
+</div>
               </div>
             </div>
 

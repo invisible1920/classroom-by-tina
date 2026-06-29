@@ -11,7 +11,7 @@ const proPlan = [
   "Parent letters",
   "Presentation slides",
   "Favorites & Library",
-  "AI tools coming soon",
+  "AI teaching tools",
 ];
 
 export default function Pricing() {
@@ -64,8 +64,8 @@ export default function Pricing() {
                 </div>
 
                 <p className="mt-5 leading-8 text-white/90">
-                  Unlock Tina&apos;s full K–2 teaching library, classroom-ready
-                  resources, favorites, downloads, and future AI planning tools.
+                  Unlock Tina&apos;s full K–2 teaching library, classroom-read
+                  resources, favorites, downloads, and AI planning tools.
                 </p>
 
                 <Link
