@@ -1,10 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  BookOpen,
-  Clock,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, BookOpen, Sparkles } from "lucide-react";
 
 import { buttonStyles } from "@/components/ui/Button";
 
@@ -21,35 +16,35 @@ export default function ContinueTeachingCard() {
           <h2 className="mt-6 text-4xl font-black leading-tight">
             First Grade ELA
             <br />
-            Week 1
+            Week 1 Resources
           </h2>
 
           <p className="mt-4 text-lg leading-8 text-white/90">
-            Jump back into short vowels, sight words, literacy centers,
-            assessments, and classroom activities for this week's lessons.
+            Pick up where you left off with this week’s lessons, literacy
+            centers, activities, assessments, and family communication.
           </p>
 
-          <div className="mt-8">
-            <div className="flex items-center justify-between text-sm font-bold">
-              <span>Week Ready</span>
-              <span>72%</span>
-            </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
+              📚 Lesson Plans
+            </span>
 
-            <div className="mt-2 h-3 overflow-hidden rounded-full bg-white/25">
-              <div className="h-full w-[72%] rounded-full bg-[#ffd54a]" />
-            </div>
+            <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
+              🎲 Centers
+            </span>
+
+            <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
+              📝 Assessments
+            </span>
+
+            <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
+              💌 Parent Letters
+            </span>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-6 text-sm font-bold text-white/90">
-            <div className="flex items-center gap-2">
-              <BookOpen size={17} />
-              18 Resources
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Clock size={17} />
-              12 min planning
-            </div>
+          <div className="mt-6 flex items-center gap-2 text-sm font-bold text-white/90">
+            <BookOpen size={17} />
+            Start with the weekly resource hub.
           </div>
         </div>
 
@@ -60,31 +55,13 @@ export default function ContinueTeachingCard() {
               variant: "white",
               size: "lg",
               className:
-                "rounded-full px-8 shadow-xl hover:scale-105 transition",
+                "rounded-full px-8 shadow-xl transition hover:scale-105",
             })}
           >
-            Continue Teaching
+            Open Week 1
             <ArrowRight size={18} />
           </Link>
         </div>
-      </div>
-
-      <div className="mt-8 flex flex-wrap gap-3">
-        <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
-          📚 Lesson Plans
-        </span>
-
-        <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
-          🎲 Centers
-        </span>
-
-        <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
-          📝 Assessment
-        </span>
-
-        <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black">
-          💌 Parent Letter
-        </span>
       </div>
     </section>
   );
