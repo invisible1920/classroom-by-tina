@@ -19,6 +19,10 @@ export default function DashboardLayout({
     { label: "Downloads", href: "/dashboard/downloads", emoji: "📥" },
   ];
 
+  const tools = [
+    { label: "AI Tools", href: "/dashboard/ai", emoji: "🤖" },
+  ];
+
   return (
     <div className="min-h-screen bg-[#fffaf3]">
       <aside className="fixed left-0 top-0 flex h-screen w-72 flex-col border-r border-[#ffe7b5] bg-white p-6">
@@ -70,6 +74,25 @@ export default function DashboardLayout({
                   key={item.href}
                   href={item.href}
                   className="flex items-center gap-3 rounded-2xl px-4 py-3 font-bold text-slate-600 transition hover:bg-[#fff3c4] hover:text-[#17223b]"
+                >
+                  <span className="w-6 text-lg">{item.emoji}</span>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="px-4 text-xs font-black uppercase tracking-widest text-slate-400">
+              AI
+            </p>
+
+            <div className="mt-3 space-y-2">
+              {tools.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-3 rounded-2xl bg-[#f7efff] px-4 py-3 font-black text-[#8a4fba] transition hover:bg-[#eadcff] hover:text-[#17223b]"
                 >
                   <span className="w-6 text-lg">{item.emoji}</span>
                   {item.label}
