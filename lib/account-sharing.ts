@@ -4,8 +4,8 @@ import { cookies, headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
-const MAX_ACTIVE_DEVICES = 2;
-const ACTIVE_WINDOW_DAYS = 30;
+const MAX_ACTIVE_DEVICES = 1;
+const ACTIVE_WINDOW_DAYS = 5;
 const DEVICE_COOKIE_NAME = "cbt_device_id";
 
 export async function enforceDeviceLimit() {

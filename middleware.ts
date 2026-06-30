@@ -3,22 +3,27 @@ import { createServerClient } from "@supabase/ssr";
 
 const DEVICE_COOKIE_NAME = "cbt_device_id";
 
+function setDeviceCookie(response: NextResponse, deviceId: string) {
+  response.cookies.set(DEVICE_COOKIE_NAME, deviceId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 365,
+    path: "/",
+  });
+}
+
 export async function middleware(request: NextRequest) {
+  const deviceId =
+    request.cookies.get(DEVICE_COOKIE_NAME)?.value ?? crypto.randomUUID();
+
+  request.cookies.set(DEVICE_COOKIE_NAME, deviceId);
+
   let response = NextResponse.next({
     request,
   });
 
-  const existingDeviceId = request.cookies.get(DEVICE_COOKIE_NAME)?.value;
-
-  if (!existingDeviceId) {
-    response.cookies.set(DEVICE_COOKIE_NAME, crypto.randomUUID(), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 365,
-      path: "/",
-    });
-  }
+  setDeviceCookie(response, deviceId);
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -41,15 +46,7 @@ export async function middleware(request: NextRequest) {
             response.cookies.set(name, value, options);
           });
 
-          if (!request.cookies.get(DEVICE_COOKIE_NAME)?.value) {
-            response.cookies.set(DEVICE_COOKIE_NAME, crypto.randomUUID(), {
-              httpOnly: true,
-              secure: process.env.NODE_ENV === "production",
-              sameSite: "lax",
-              maxAge: 60 * 60 * 24 * 365,
-              path: "/",
-            });
-          }
+          setDeviceCookie(response, deviceId);
         },
       },
     }

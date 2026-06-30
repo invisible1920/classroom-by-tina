@@ -9,7 +9,7 @@ export default function DeviceLimitPage() {
         </div>
 
         <h1 className="text-3xl font-black tracking-tight text-[#17223b]">
-          This account is already active on two devices.
+          This account is already active on one device.
         </h1>
 
         <p className="mt-4 text-base leading-7 text-slate-600">
