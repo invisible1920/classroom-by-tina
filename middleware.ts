@@ -1,7 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const DEVICE_COOKIE_NAME = "cbt_device_id";
+const DEVICE_COOKIE_NAME =
+  process.env.NODE_ENV === "production"
+    ? "cbt_device_id"
+    : "cbt_device_id_dev";
 
 function setDeviceCookie(response: NextResponse, deviceId: string) {
   response.cookies.set(DEVICE_COOKIE_NAME, deviceId, {

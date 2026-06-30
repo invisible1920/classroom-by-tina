@@ -6,7 +6,10 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 const MAX_ACTIVE_DEVICES = 1;
 const ACTIVE_WINDOW_DAYS = 5;
-const DEVICE_COOKIE_NAME = "cbt_device_id";
+const DEVICE_COOKIE_NAME =
+  process.env.NODE_ENV === "production"
+    ? "cbt_device_id"
+    : "cbt_device_id_dev";
 
 export async function enforceDeviceLimit() {
   const supabase = await createClient();
