@@ -46,12 +46,6 @@ const adminActions = [
     href: "/admin/ai",
     icon: Sparkles,
   },
-  {
-    title: "Settings",
-    description: "Manage branding, billing, platform settings, and policies.",
-    href: "/admin/settings",
-    icon: Settings,
-  },
 ];
 
 export default async function AdminPage() {

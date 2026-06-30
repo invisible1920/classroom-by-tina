@@ -7,7 +7,6 @@ import {
   BarChart3,
   FileText,
   Home,
-  Settings,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -18,7 +17,6 @@ const adminNavItems = [
   { label: "Teachers", href: "/admin/teachers", icon: Users },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { label: "AI Tools", href: "/admin/ai", icon: Sparkles },
-  { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default async function AdminLayout({
