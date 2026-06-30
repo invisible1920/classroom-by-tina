@@ -102,31 +102,42 @@ export default async function LoginPage({
 )}
 
         <form action={login}>
-          <div className="mt-6 grid gap-4">
-            <input
-              name="email"
-              type="email"
-              required
-              placeholder="Email"
-              className="admin-input"
-            />
+  <div className="mt-6 grid gap-4">
+    <input
+      name="email"
+      type="email"
+      required
+      placeholder="Email"
+      className="admin-input"
+    />
 
-            <input
-              name="password"
-              type="password"
-              required
-              placeholder="Password"
-              className="admin-input"
-            />
-          </div>
+    <div>
+      <input
+        name="password"
+        type="password"
+        required
+        placeholder="Password"
+        className="admin-input"
+      />
 
-          <button
-            type="submit"
-            className="mt-6 w-full rounded-full bg-[#1f2a44] px-6 py-4 font-black text-white"
-          >
-            Sign in
-          </button>
-        </form>
+      <div className="mt-2 text-right">
+        <Link
+          href="/forgot-password"
+          className="text-sm font-bold text-[#3b82f6] hover:underline"
+        >
+          Forgot password?
+        </Link>
+      </div>
+    </div>
+  </div>
+
+  <button
+    type="submit"
+    className="mt-6 w-full rounded-full bg-[#1f2a44] px-6 py-4 font-black text-white"
+  >
+    Sign in
+  </button>
+</form>
 
         <div className="my-6 flex items-center gap-4">
           <div className="h-px flex-1 bg-slate-200" />

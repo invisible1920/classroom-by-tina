@@ -13,8 +13,12 @@ export default async function DashboardLayout({
   const deviceCheck = await enforceDeviceLimit();
 
   if (!deviceCheck.allowed) {
-    redirect("/account/device-limit");
+  if (deviceCheck.reason === "DEVICE_REVOKED") {
+    redirect("/login?reason=device_revoked");
   }
+
+  redirect("/account/device-limit");
+}
 
   const grades = [
     { label: "Kindergarten", href: "/dashboard/kindergarten", emoji: "✨" },
@@ -32,7 +36,7 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-[#fffaf3]">
       <aside className="fixed left-0 top-0 flex h-dvh w-72 flex-col overflow-hidden border-r border-[#ffe7b5] bg-white p-6">
-        <Link href="/" className="shrink-0 flex items-center gap-3">
+        <Link href="/dashboard" className="shrink-0 flex items-center gap-3">
           <div className="relative h-14 w-14 shrink-0">
             <Image
               src="/images/logo.png"
