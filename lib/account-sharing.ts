@@ -34,6 +34,9 @@ export async function enforceDeviceLimit() {
     };
   }
 
+  const DEVICE_ENVIRONMENT =
+  process.env.NODE_ENV === "production" ? "production" : "development";
+
   const userAgent = headerStore.get("user-agent") ?? "Unknown";
 
   const ipAddress =
@@ -48,15 +51,16 @@ export async function enforceDeviceLimit() {
   .from("user_devices")
   .select("id, revoked_at")
   .eq("user_id", user.id)
-  .eq("device_id", deviceId)
-  .maybeSingle();
+.eq("device_id", deviceId)
+.eq("environment", DEVICE_ENVIRONMENT)
+.maybeSingle();
 
 if (existingDevice?.revoked_at) {
   await supabase.auth.signOut();
 
   const cookieStore = await cookies();
 
-  cookieStore.delete("cbt_device_id");
+  cookieStore.delete(DEVICE_COOKIE_NAME);
 
   return {
     allowed: false,
@@ -81,7 +85,8 @@ if (existingDevice?.revoked_at) {
     .from("user_devices")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
-    .gte("last_seen_at", cutoffDate.toISOString())
+.eq("environment", DEVICE_ENVIRONMENT)
+.gte("last_seen_at", cutoffDate.toISOString())
 .is("revoked_at", null);
 
   if ((count ?? 0) >= MAX_ACTIVE_DEVICES) {
@@ -92,11 +97,12 @@ if (existingDevice?.revoked_at) {
   }
 
   await supabaseAdmin.from("user_devices").insert({
-    user_id: user.id,
-    device_id: deviceId,
-    user_agent: userAgent,
-    ip_address: ipAddress,
-  });
+  user_id: user.id,
+  device_id: deviceId,
+  environment: DEVICE_ENVIRONMENT,
+  user_agent: userAgent,
+  ip_address: ipAddress,
+});
 
   return { allowed: true };
 }
