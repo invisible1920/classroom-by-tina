@@ -2,7 +2,9 @@ import Link from "next/link";
 import { Search, Users } from "lucide-react";
 import { getTeachers } from "@/services";
 import { RoleSelect, PlanSelect } from "@/components/admin/TeacherSelect";
+import DeleteTeacherButton from "@/components/admin/DeleteTeacherButton";
 import {
+  deleteTeacherAccount,
   updateTeacherRole,
   updateTeacherSubscription,
 } from "./actions";
@@ -124,6 +126,7 @@ export default async function TeachersPage({
                   <th className="py-3 font-black">Joined</th>
                   <th className="py-3 font-black">Update</th>
                   <th className="py-3 font-black">Details</th>
+                  <th className="py-3 font-black">Delete</th>
                 </tr>
               </thead>
 
@@ -186,13 +189,21 @@ export default async function TeachersPage({
                           View
                         </Link>
                       </td>
+                      <td className="py-4">
+  <form action={deleteTeacherAccount}>
+  <input type="hidden" name="teacherId" value={teacher.id} />
+  <input type="hidden" name="confirmDelete" value="DELETE" />
+
+  <DeleteTeacherButton />
+</form>
+</td>
                     </tr>
                   );
                 })}
 
                 {filteredTeachers.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-500">
+                    <td colSpan={7} className="py-8 text-center text-slate-500">
                       No accounts found.
                     </td>
                   </tr>
