@@ -1,13 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { signOut } from "@/app/actions/auth";
+import { enforceDeviceLimit } from "@/lib/account-sharing";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const deviceCheck = await enforceDeviceLimit();
+
+  if (!deviceCheck.allowed) {
+    redirect("/account/device-limit");
+  }
+
   const grades = [
     { label: "Kindergarten", href: "/dashboard/kindergarten", emoji: "✨" },
     { label: "First Grade", href: "/dashboard/first-grade", emoji: "📚" },
