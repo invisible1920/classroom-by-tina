@@ -56,7 +56,7 @@ export default function About() {
               <div className="mt-8 flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
                 <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-white bg-white shadow-xl sm:h-32 sm:w-32">
                   <Image
-                    src="/tina.jpg"
+                    src="/images/hero/tina.jpg"
                     alt="Tina"
                     fill
                     sizes="128px"

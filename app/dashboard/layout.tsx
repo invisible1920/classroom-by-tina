@@ -19,14 +19,12 @@ export default function DashboardLayout({
     { label: "Downloads", href: "/dashboard/downloads", emoji: "📥" },
   ];
 
-  const tools = [
-    { label: "AI Tools", href: "/dashboard/ai", emoji: "🤖" },
-  ];
+  const tools = [{ label: "AI Tools", href: "/dashboard/ai", emoji: "🤖" }];
 
   return (
     <div className="min-h-screen bg-[#fffaf3]">
-      <aside className="fixed left-0 top-0 flex h-screen w-72 flex-col border-r border-[#ffe7b5] bg-white p-6">
-        <Link href="/" className="flex items-center gap-3">
+      <aside className="fixed left-0 top-0 flex h-dvh w-72 flex-col overflow-hidden border-r border-[#ffe7b5] bg-white p-6">
+        <Link href="/" className="shrink-0 flex items-center gap-3">
           <div className="relative h-14 w-14 shrink-0">
             <Image
               src="/images/logo.png"
@@ -48,7 +46,7 @@ export default function DashboardLayout({
           </div>
         </Link>
 
-        <nav className="mt-10 flex-1 space-y-8">
+        <nav className="mt-8 min-h-0 flex-1 space-y-7 overflow-y-auto pr-1">
           <div>
             <p className="px-4 text-xs font-black uppercase tracking-widest text-slate-400">
               Main
@@ -135,7 +133,7 @@ export default function DashboardLayout({
           </div>
         </nav>
 
-        <form action={signOut} className="border-t border-[#ffe7b5] pt-4">
+        <form action={signOut} className="shrink-0 border-t border-[#ffe7b5] pt-4">
           <button
             type="submit"
             className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 font-bold text-slate-600 transition hover:bg-[#ff6f91]/10 hover:text-[#ff6f91]"
