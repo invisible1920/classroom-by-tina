@@ -6,6 +6,8 @@ import type {
   UpdateResourceInput,
 } from "@/types/resource";
 
+const RESOURCE_BUCKET = "resources";
+
 type SupabaseResource = {
   id: string;
   slug: string;
@@ -58,8 +60,8 @@ export async function getResourcesFromSupabase(options?: {
     .order("created_at", { ascending: false });
 
   if (!options?.isAdmin && options?.activeMonths?.length) {
-  query = query.in("month", options.activeMonths);
-}
+    query = query.in("month", options.activeMonths);
+  }
 
   const { data, error } = await query;
 
@@ -164,11 +166,95 @@ export async function permanentlyDeleteResourceInSupabase(
     return null;
   }
 
+  const filesToDelete = await getUnusedStoragePaths(existing);
+
   const { error } = await supabaseAdmin.from("resources").delete().eq("id", id);
 
   if (error) {
     throw new Error(error.message);
   }
 
+  if (filesToDelete.length > 0) {
+    const { error: storageError } = await supabaseAdmin.storage
+      .from(RESOURCE_BUCKET)
+      .remove(filesToDelete);
+
+    if (storageError) {
+      throw new Error(storageError.message);
+    }
+  }
+
   return existing;
+}
+
+async function getUnusedStoragePaths(resource: Resource): Promise<string[]> {
+  const values = [resource.pdf, resource.thumbnail].filter(Boolean);
+  const uniqueValues = Array.from(new Set(values));
+  const paths: string[] = [];
+
+  for (const value of uniqueValues) {
+    const [{ count: pdfCount, error: pdfError }, { count: thumbnailCount, error: thumbnailError }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("resources")
+          .select("id", { count: "exact", head: true })
+          .neq("id", resource.id)
+          .eq("pdf", value),
+
+        supabaseAdmin
+          .from("resources")
+          .select("id", { count: "exact", head: true })
+          .neq("id", resource.id)
+          .eq("thumbnail", value),
+      ]);
+
+    if (pdfError) {
+      throw new Error(pdfError.message);
+    }
+
+    if (thumbnailError) {
+      throw new Error(thumbnailError.message);
+    }
+
+    const stillUsed = (pdfCount ?? 0) + (thumbnailCount ?? 0) > 0;
+
+    if (!stillUsed) {
+      const path = getStoragePath(value);
+
+      if (path) {
+        paths.push(path);
+      }
+    }
+  }
+
+  return Array.from(new Set(paths));
+}
+
+function getStoragePath(value: string): string | null {
+  if (!value) {
+    return null;
+  }
+
+  if (!value.startsWith("http")) {
+    return value.replace(/^resources\//, "");
+  }
+
+  try {
+    const url = new URL(value);
+
+    const publicMarker = `/storage/v1/object/public/${RESOURCE_BUCKET}/`;
+    const signedMarker = `/storage/v1/object/sign/${RESOURCE_BUCKET}/`;
+
+    if (url.pathname.includes(publicMarker)) {
+      return decodeURIComponent(url.pathname.split(publicMarker)[1] ?? "");
+    }
+
+    if (url.pathname.includes(signedMarker)) {
+      return decodeURIComponent(url.pathname.split(signedMarker)[1] ?? "");
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
 }

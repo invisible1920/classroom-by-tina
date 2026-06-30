@@ -4,6 +4,7 @@ import {
   getResourcesFromSupabase,
   updateResourceInSupabase,
   restoreResourceInSupabase,
+  permanentlyDeleteResourceInSupabase,
 } from "@/repositories/resources/resources.repository";
 import type {
   AbilityGroup,
@@ -236,6 +237,12 @@ export async function duplicateResource(id: string): Promise<Resource | null> {
     featured: false,
     status: "draft",
   });
+}
+
+export async function permanentlyDeleteResource(
+  id: string
+): Promise<Resource | null> {
+  return permanentlyDeleteResourceInSupabase(id);
 }
 
 export async function restoreResource(id: string): Promise<Resource | null> {
