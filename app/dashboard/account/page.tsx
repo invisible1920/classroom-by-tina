@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import {
   BadgeCheck,
@@ -6,6 +7,7 @@ import {
   CreditCard,
   GraduationCap,
   Mail,
+  Monitor,
   School,
   ShieldCheck,
   User,
@@ -58,6 +60,42 @@ async function updateProfile(formData: FormData) {
   );
 }
 
+async function signOutOtherDevices() {
+  "use server";
+
+  const access = await getCurrentUserAccess();
+
+  if (!access.userId) {
+    redirect("/login");
+  }
+
+  const cookieStore = await cookies();
+
+  const currentDeviceId =
+    cookieStore.get("cbt_device_id")?.value ?? null;
+
+  if (!currentDeviceId) {
+    redirect("/dashboard/account");
+  }
+
+  const supabase = await createClient();
+
+  await supabase
+    .from("user_devices")
+    .update({
+      revoked_at: new Date().toISOString(),
+    })
+    .eq("user_id", access.userId)
+    .neq("device_id", currentDeviceId)
+    .is("revoked_at", null);
+
+  revalidatePath("/dashboard/account");
+
+  redirect(
+    "/dashboard/account?success=Other%20devices%20signed%20out"
+  );
+}
+
 function formatDate(value?: string | null) {
   if (!value) return null;
 
@@ -66,6 +104,37 @@ function formatDate(value?: string | null) {
     day: "numeric",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function formatDevice(userAgent?: string | null) {
+  if (!userAgent) {
+    return "Unknown Device";
+  }
+
+  let os = "Unknown OS";
+
+  if (userAgent.includes("Windows")) os = "Windows";
+  else if (userAgent.includes("Mac OS")) os = "Mac";
+  else if (userAgent.includes("iPhone")) os = "iPhone";
+  else if (userAgent.includes("iPad")) os = "iPad";
+  else if (userAgent.includes("Android")) os = "Android";
+
+  let browser = "Browser";
+
+  if (userAgent.includes("Edg")) browser = "Edge";
+  else if (userAgent.includes("Chrome")) browser = "Chrome";
+  else if (userAgent.includes("Firefox")) browser = "Firefox";
+  else if (userAgent.includes("Safari")) browser = "Safari";
+
+  return `${os} • ${browser}`;
+}
+
+function formatIpAddress(ip?: string | null) {
+  if (!ip || ip === "::1" || ip === "127.0.0.1") {
+    return "Local development";
+  }
+
+  return ip;
 }
 
 function getSubscriptionDisplay(status: string) {
@@ -122,13 +191,26 @@ export default async function AccountPage({
 
   const supabase = await createClient();
 
-  const { data: profile } = await supabase
+const cookieStore = await cookies();
+
+const currentDeviceId =
+  cookieStore.get("cbt_device_id")?.value ?? null;
+
+const { data: profile } = await supabase
     .from("profiles")
     .select(
       "full_name, email, school, role, subscription_status, grade_level, subjects, created_at, stripe_current_period_end, stripe_customer_id"
     )
     .eq("id", access.userId)
     .maybeSingle();
+  const { data: devices } = await supabase
+  .from("user_devices")
+  .select(
+    "id, device_id, user_agent, ip_address, last_seen_at, created_at"
+  )
+  .eq("user_id", access.userId)
+  .is("revoked_at", null)
+  .order("last_seen_at", { ascending: false });
 
   if (!profile) {
     redirect("/signup");
@@ -394,6 +476,72 @@ export default async function AccountPage({
           </form>
         </section>
       </div>
+      <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+  <div className="flex items-start gap-3">
+    <div className="rounded-2xl bg-[#e8fbfb] p-3 text-[#35c6c9]">
+      <Monitor size={22} />
+    </div>
+
+    <div>
+      <h2 className="text-2xl font-black text-slate-900">
+        Trusted Devices
+      </h2>
+
+      <p className="mt-1 text-slate-500">
+        View every device currently signed into your Classroom by Tina account.
+      </p>
+    <form action={signOutOtherDevices} className="mt-4">
+  <button
+    type="submit"
+    className="rounded-full bg-[#ff6f91] px-5 py-2.5 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-[#e85f80]"
+  >
+    Sign Out Other Devices
+  </button>
+</form>  
+    </div>
+  </div>
+
+  <div className="mt-8 space-y-4">
+    {(devices ?? []).map((device) => {
+  const isCurrentDevice = device.device_id === currentDeviceId;
+
+  return (
+      <div
+        key={device.id}
+        className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+      >
+        <div className="flex items-center justify-between">
+  <p className="font-black text-slate-900">
+    {formatDevice(device.user_agent)}
+  </p>
+
+  {isCurrentDevice && (
+    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-700">
+      Current Device
+    </span>
+  )}
+</div>
+
+        <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
+  <span>🌐</span>
+  <span>{formatIpAddress(device.ip_address)}</span>
+</div>
+
+        <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
+  <span>🕒</span>
+  <span>Last active {formatDate(device.last_seen_at)}</span>
+</div>
+            </div>
+    );
+  })}
+
+    {devices?.length === 0 && (
+      <div className="rounded-2xl bg-slate-50 p-5 text-slate-500">
+        No trusted devices found.
+      </div>
+    )}
+  </div>
+</section>
     </>
   );
 }

@@ -46,6 +46,7 @@ export async function enforceDeviceLimit() {
     .select("id")
     .eq("user_id", user.id)
     .eq("device_id", deviceId)
+    .is("revoked_at", null)
     .maybeSingle();
 
   if (existingDevice) {
@@ -65,7 +66,8 @@ export async function enforceDeviceLimit() {
     .from("user_devices")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
-    .gte("last_seen_at", cutoffDate.toISOString());
+    .gte("last_seen_at", cutoffDate.toISOString())
+.is("revoked_at", null);
 
   if ((count ?? 0) >= MAX_ACTIVE_DEVICES) {
     return {
