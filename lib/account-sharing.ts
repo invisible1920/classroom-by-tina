@@ -42,12 +42,24 @@ export async function enforceDeviceLimit() {
   cutoffDate.setDate(cutoffDate.getDate() - ACTIVE_WINDOW_DAYS);
 
   const { data: existingDevice } = await supabaseAdmin
-    .from("user_devices")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("device_id", deviceId)
-    .is("revoked_at", null)
-    .maybeSingle();
+  .from("user_devices")
+  .select("id, revoked_at")
+  .eq("user_id", user.id)
+  .eq("device_id", deviceId)
+  .maybeSingle();
+
+if (existingDevice?.revoked_at) {
+  await supabase.auth.signOut();
+
+  const cookieStore = await cookies();
+
+  cookieStore.delete("cbt_device_id");
+
+  return {
+    allowed: false,
+    reason: "DEVICE_REVOKED",
+  };
+}
 
   if (existingDevice) {
     await supabaseAdmin

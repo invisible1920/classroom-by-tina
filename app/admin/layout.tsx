@@ -29,8 +29,12 @@ export default async function AdminLayout({
   const deviceCheck = await enforceDeviceLimit();
 
   if (!deviceCheck.allowed) {
-    redirect("/account/device-limit");
+  if (deviceCheck.reason === "DEVICE_REVOKED") {
+    redirect("/login?reason=device_revoked");
   }
+
+  redirect("/account/device-limit");
+}
 
   return (
     <div className="min-h-screen bg-[#fff8f0]">

@@ -69,7 +69,7 @@ async function signInWithGoogle() {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; reason?: string }>;
 }) {
   const params = await searchParams;
 
@@ -87,6 +87,19 @@ export default async function LoginPage({
             {params.error}
           </div>
         )}
+
+        {params.reason === "device_revoked" && (
+  <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+    <h3 className="font-black text-amber-900">
+      You've been signed out
+    </h3>
+
+    <p className="mt-1 text-sm font-semibold text-amber-800">
+      This device was removed from your trusted devices. Please sign in again if
+      you'd like to use this device.
+    </p>
+  </div>
+)}
 
         <form action={login}>
           <div className="mt-6 grid gap-4">
