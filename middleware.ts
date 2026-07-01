@@ -86,14 +86,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if (
-    isDashboardRoute &&
-    profile.role === "teacher" &&
-    profile.subscription_status !== "pro"
-  ) {
-    return NextResponse.redirect(new URL("/subscribe", request.url));
-  }
-
   return response;
 }
 

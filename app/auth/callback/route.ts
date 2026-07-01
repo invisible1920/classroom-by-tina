@@ -32,11 +32,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL("/admin", requestUrl.origin));
     }
 
-    if (profile.subscription_status === "pro") {
-      return NextResponse.redirect(new URL("/dashboard", requestUrl.origin));
-    }
-
-    return NextResponse.redirect(new URL("/subscribe", requestUrl.origin));
+    return NextResponse.redirect(new URL("/dashboard", requestUrl.origin));
   }
 
   return NextResponse.redirect(new URL("/login", requestUrl.origin));

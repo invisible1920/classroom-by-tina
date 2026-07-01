@@ -91,10 +91,6 @@ export default async function DashboardPage() {
     redirect("/signup");
   }
 
-  if (profile.role !== "admin" && profile.subscription_status !== "pro") {
-    redirect("/subscribe");
-  }
-
   const displayName =
     user.user_metadata?.full_name ||
     user.user_metadata?.name ||

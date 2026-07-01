@@ -29,7 +29,7 @@ async function signup(formData: FormData) {
     redirect(`/signup?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect("/subscribe");
+  redirect("/dashboard");
 }
 
 async function signInWithGoogle() {

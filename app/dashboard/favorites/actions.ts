@@ -16,6 +16,19 @@ export async function toggleFavorite(resourceId: string) {
     redirect("/login");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, subscription_status")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const isPro =
+    profile?.role === "admin" || profile?.subscription_status === "pro";
+
+  if (!isPro) {
+    redirect("/subscribe?reason=favorites");
+  }
+
   const { data: existingFavorite } = await supabase
     .from("resource_favorites")
     .select("id")
@@ -36,8 +49,8 @@ export async function toggleFavorite(resourceId: string) {
   }
 
   revalidatePath("/dashboard", "layout");
-revalidatePath("/dashboard/favorites", "page");
-revalidatePath("/dashboard/kindergarten", "page");
-revalidatePath("/dashboard/first-grade", "page");
-revalidatePath("/dashboard/second-grade", "page");
+  revalidatePath("/dashboard/favorites", "page");
+  revalidatePath("/dashboard/kindergarten", "page");
+  revalidatePath("/dashboard/first-grade", "page");
+  revalidatePath("/dashboard/second-grade", "page");
 }

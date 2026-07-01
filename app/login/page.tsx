@@ -33,10 +33,6 @@ async function login(formData: FormData) {
     redirect("/admin");
   }
 
-  if (profile.subscription_status !== "pro") {
-    redirect("/subscribe");
-  }
-
   redirect("/dashboard");
 }
 

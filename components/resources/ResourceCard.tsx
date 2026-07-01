@@ -118,7 +118,7 @@ export default function ResourceCard({
           href={`/dashboard/resources/${resource.id}`}
           className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#35c6c9] px-4 py-3 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#2fb4b7]"
         >
-          Open Resource
+          Preview Resource
           <ArrowRight size={15} />
         </Link>
       </div>

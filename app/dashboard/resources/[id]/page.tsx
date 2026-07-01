@@ -7,7 +7,6 @@ import {
   FileText,
   GraduationCap,
   Layers3,
-  Star,
 } from "lucide-react";
 
 import { getResource } from "@/services";
@@ -28,6 +27,22 @@ async function trackDownload(formData: FormData) {
 
   if (!user) {
     redirect("/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, subscription_status")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile) {
+    redirect("/signup");
+  }
+
+  const isPro = profile.role === "admin" || profile.subscription_status === "pro";
+
+  if (!isPro) {
+    redirect("/subscribe?reason=download");
   }
 
   if (resourceId && resourceTitle) {
@@ -70,10 +85,6 @@ export default async function ResourceDetailPage({
 
   if (!profile) {
     redirect("/signup");
-  }
-
-  if (profile.role !== "admin" && profile.subscription_status !== "pro") {
-    redirect("/subscribe");
   }
 
   const resource = await getResource(id);

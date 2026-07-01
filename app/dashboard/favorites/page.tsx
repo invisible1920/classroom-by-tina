@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, Lock } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import ResourceCard from "@/components/resources/ResourceCard";
@@ -15,6 +15,66 @@ export default async function FavoritesPage() {
 
   if (!user) {
     redirect("/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, subscription_status")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const isPro =
+    profile?.role === "admin" || profile?.subscription_status === "pro";
+
+  if (!isPro) {
+    return (
+      <main>
+        <section className="rounded-[2rem] bg-[#1f2a44] p-8 text-white shadow-2xl shadow-slate-950/15">
+          <div className="flex items-start gap-4">
+            <div className="rounded-2xl bg-white/10 p-3 text-[#f5b942]">
+              <Heart size={30} />
+            </div>
+
+            <div>
+              <p className="text-sm font-black uppercase tracking-widest text-[#f5b942]">
+                Pro Feature
+              </p>
+
+              <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">
+                Favorites
+              </h1>
+
+              <p className="mt-4 max-w-3xl text-lg leading-8 text-white/70">
+                Save your favorite lesson plans, centers, activities, and
+                classroom resources for quick access.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-8 rounded-[2rem] border border-[#ffe7b5] bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-rose-50 text-rose-500">
+            <Lock size={30} />
+          </div>
+
+          <h2 className="mt-6 text-3xl font-black text-[#1f2a44]">
+            Upgrade to save favorites
+          </h2>
+
+          <p className="mx-auto mt-3 max-w-xl text-lg leading-8 text-slate-600">
+            Favorites are included with Pro so you can save resources and find
+            them quickly later.
+          </p>
+
+          <Link
+            href="/subscribe?reason=favorites"
+            className="mt-6 inline-flex rounded-full bg-[#1f2a44] px-6 py-3 font-black text-white transition hover:-translate-y-0.5 hover:bg-[#35c6c9]"
+          >
+            Upgrade to Pro
+          </Link>
+        </section>
+      </main>
+    );
   }
 
   const { data: favorites, error } = await supabase
@@ -59,14 +119,14 @@ export default async function FavoritesPage() {
       </section>
 
       {resources.length > 0 ? (
-  <section className="mt-8">
-    <div className="grid max-w-7xl gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-      {resources.map((resource) => (
-        <ResourceCard key={resource.id} resource={resource} isFavorite />
-      ))}
-    </div>
-  </section>
-) : (
+        <section className="mt-8">
+          <div className="grid max-w-7xl gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {resources.map((resource) => (
+              <ResourceCard key={resource.id} resource={resource} isFavorite />
+            ))}
+          </div>
+        </section>
+      ) : (
         <section className="mt-8 rounded-[2rem] border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose-50 text-rose-500">
             <Heart size={30} />

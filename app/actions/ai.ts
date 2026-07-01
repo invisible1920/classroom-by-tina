@@ -156,13 +156,29 @@ export async function generateLessonPlanAction(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return {
-      success: false,
-      error: "You must be signed in to generate a lesson plan.",
-    };
-  }
+  return {
+    success: false,
+    error: "You must be signed in to generate a lesson plan.",
+  };
+}
 
-  const creditCost = AI_CREDIT_COSTS.lessonPlan;
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("role, subscription_status")
+  .eq("id", user.id)
+  .maybeSingle();
+
+const isPro =
+  profile?.role === "admin" || profile?.subscription_status === "pro";
+
+if (!isPro) {
+  return {
+    success: false,
+    error: "Upgrade to Pro to use the AI Lesson Planner.",
+  };
+}
+
+const creditCost = AI_CREDIT_COSTS.lessonPlan;
   const creditReservation = await reserveCredits(supabase, creditCost);
 
   if (!creditReservation.allowed) {
@@ -256,13 +272,29 @@ export async function generateActivityAction(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return {
-      success: false,
-      error: "You must be signed in to generate an activity.",
-    };
-  }
+  return {
+    success: false,
+    error: "You must be signed in to generate an activity.",
+  };
+}
 
-  const creditCost = AI_CREDIT_COSTS.activity;
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("role, subscription_status")
+  .eq("id", user.id)
+  .maybeSingle();
+
+const isPro =
+  profile?.role === "admin" || profile?.subscription_status === "pro";
+
+if (!isPro) {
+  return {
+    success: false,
+    error: "Upgrade to Pro to use the AI Activity Generator.",
+  };
+}
+
+const creditCost = AI_CREDIT_COSTS.activity;
   const creditReservation = await reserveCredits(supabase, creditCost);
 
   if (!creditReservation.allowed) {
@@ -356,13 +388,29 @@ export async function generateParentLetterAction(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return {
-      success: false,
-      error: "You must be signed in to generate a parent letter.",
-    };
-  }
+  return {
+    success: false,
+    error: "You must be signed in to generate a parent letter.",
+  };
+}
 
-  const creditCost = AI_CREDIT_COSTS.parentLetter;
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("role, subscription_status")
+  .eq("id", user.id)
+  .maybeSingle();
+
+const isPro =
+  profile?.role === "admin" || profile?.subscription_status === "pro";
+
+if (!isPro) {
+  return {
+    success: false,
+    error: "Upgrade to Pro to use the AI Parent Letter Helper.",
+  };
+}
+
+const creditCost = AI_CREDIT_COSTS.parentLetter;
   const creditReservation = await reserveCredits(supabase, creditCost);
 
   if (!creditReservation.allowed) {

@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Download } from "lucide-react";
+import { Download, Lock } from "lucide-react";
 
 import ResourceCard from "@/components/resources/ResourceCard";
 import { createClient } from "@/utils/supabase/server";
@@ -15,6 +16,59 @@ export default async function DownloadsPage() {
 
   if (!user) {
     redirect("/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, subscription_status")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const isPro =
+    profile?.role === "admin" || profile?.subscription_status === "pro";
+
+  if (!isPro) {
+    return (
+      <main>
+        <div className="flex items-center gap-4">
+          <div className="rounded-2xl bg-blue-100 p-4">
+            <Download className="text-blue-600" size={28} />
+          </div>
+
+          <div>
+            <h1 className="text-4xl font-black text-slate-900">
+              My Downloads
+            </h1>
+
+            <p className="mt-2 text-lg text-slate-600">
+              Your downloaded classroom resources will appear here.
+            </p>
+          </div>
+        </div>
+
+        <section className="mt-8 rounded-[2rem] border border-[#ffe7b5] bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-blue-50 text-blue-600">
+            <Lock size={30} />
+          </div>
+
+          <h2 className="mt-6 text-3xl font-black text-[#1f2a44]">
+            Download history is a Pro feature
+          </h2>
+
+          <p className="mx-auto mt-3 max-w-xl text-lg leading-8 text-slate-600">
+            Upgrade to Pro to download unlimited classroom resources and keep
+            your personal download library available anytime.
+          </p>
+
+          <Link
+            href="/subscribe?reason=download"
+            className="mt-6 inline-flex rounded-full bg-[#1f2a44] px-6 py-3 font-black text-white transition hover:-translate-y-0.5 hover:bg-[#35c6c9]"
+          >
+            Upgrade to Pro
+          </Link>
+        </section>
+      </main>
+    );
   }
 
   const { data: downloads, error } = await supabase
@@ -52,10 +106,12 @@ export default async function DownloadsPage() {
         </div>
 
         <div>
-          <h1 className="text-4xl font-black text-slate-900">My Downloads</h1>
+          <h1 className="text-4xl font-black text-slate-900">
+            My Downloads
+          </h1>
 
           <p className="mt-2 text-lg text-slate-600">
-            Every resource you&apos;ve downloaded is saved here for quick access.
+            Every resource you've downloaded is saved here for quick access.
           </p>
         </div>
       </div>
