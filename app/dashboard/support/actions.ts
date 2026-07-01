@@ -126,12 +126,18 @@ export async function closeTicket(formData: FormData) {
     redirect("/dashboard/support");
   }
 
-  const { error } = await supabase
-    .from("support_requests")
-    .update({
-      status: "closed",
-    })
-    .eq("id", ticketId);
+  const { data, error } = await supabase
+  .from("support_requests")
+  .update({
+    status: "closed",
+  })
+  .eq("id", ticketId)
+  .eq("user_id", user.id)
+  .select("*");
+
+console.log("ticketId:", ticketId);
+console.log("updated rows:", data);
+console.log("error:", error);
 
   if (error) {
     console.error(error.message);

@@ -37,16 +37,24 @@ export default async function SupportPage({
     status,
     created_at,
     support_messages (
-  id,
-  sender,
-  message,
-  created_at,
-  is_read
-)
+      id,
+      sender,
+      message,
+      created_at,
+      is_read
+    )
   `)
   .eq("user_id", user.id)
   .order("created_at", { ascending: false });
 
+// Sort each conversation oldest -> newest
+requests?.forEach((request: any) => {
+  request.support_messages?.sort(
+    (a: any, b: any) =>
+      new Date(a.created_at).getTime() -
+      new Date(b.created_at).getTime()
+  );
+});
 
 return (
     <main>
@@ -311,11 +319,11 @@ function StatusBadge({ status }: { status: string | null }) {
   const label = status ?? "open";
 
   const styles =
-    label === "closed"
-      ? "bg-slate-200 text-slate-600"
-      : label === "reviewing"
-        ? "bg-yellow-100 text-yellow-700"
-        : "bg-green-100 text-green-700";
+  label === "closed"
+    ? "bg-slate-200 text-slate-700"
+    : label === "reviewing"
+      ? "bg-yellow-100 text-yellow-700"
+      : "bg-blue-100 text-blue-700";
 
   return (
     <span className={`rounded-full px-4 py-2 text-sm font-black capitalize ${styles}`}>
