@@ -9,12 +9,14 @@ import {
   Home,
   Sparkles,
   Users,
+  LifeBuoy,
 } from "lucide-react";
 
 const adminNavItems = [
   { label: "Home", href: "/admin", icon: Home },
   { label: "Resources", href: "/admin/resources", icon: FileText },
   { label: "Teachers", href: "/admin/teachers", icon: Users },
+  { label: "Support", href: "/admin/support", icon: LifeBuoy },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { label: "AI Tools", href: "/admin/ai", icon: Sparkles },
 ];

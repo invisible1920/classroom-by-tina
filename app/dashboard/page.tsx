@@ -156,7 +156,50 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <DashboardHeader name={displayName} />
+      <DashboardHeader
+  name={displayName}
+  role={profile.role}
+  subscriptionStatus={profile.subscription_status}
+/>
+
+{profile.subscription_status !== "pro" && profile.role !== "admin" && (
+  <section className="mt-8 overflow-hidden rounded-[2rem] border-2 border-[#35c6c9] bg-gradient-to-r from-[#35c6c9] to-[#6fd9db] p-8 text-white shadow-xl">
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <p className="text-sm font-black uppercase tracking-widest opacity-90">
+          🚀 Upgrade to Pro
+        </p>
+
+        <h2 className="mt-2 text-3xl font-black">
+          Unlock Everything Classroom by Tina Offers
+        </h2>
+
+        <p className="mt-3 max-w-2xl text-lg text-white/90">
+          Download unlimited classroom resources, unlock AI teaching tools,
+          save favorites, and get next month's materials 4 days early.
+        </p>
+
+        <div className="mt-6 grid gap-2 sm:grid-cols-2">
+          <div>✓ Unlimited Downloads</div>
+          <div>✓ AI Lesson Planner</div>
+          <div>✓ AI Activity Generator</div>
+          <div>✓ Parent Letter Generator</div>
+          <div>✓ Save Favorites</div>
+          <div>✓ New Monthly Resources</div>
+        </div>
+      </div>
+
+      <div className="shrink-0">
+        <Link
+          href="/subscribe"
+          className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-lg font-black text-[#35c6c9] transition hover:scale-105"
+        >
+          Upgrade for $14.99/month →
+        </Link>
+      </div>
+    </div>
+  </section>
+)}
 
       <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatsCard

@@ -27,9 +27,10 @@ export default async function DashboardLayout({
   ];
 
   const resources = [
-    { label: "Favorites", href: "/dashboard/favorites", emoji: "💛" },
-    { label: "Downloads", href: "/dashboard/downloads", emoji: "📥" },
-  ];
+  { label: "Favorites", href: "/dashboard/favorites", emoji: "💛" },
+  { label: "Downloads", href: "/dashboard/downloads", emoji: "📥" },
+  { label: "Help & Support", href: "/dashboard/support", emoji: "💬" },
+];
 
   const tools = [{ label: "AI Tools", href: "/dashboard/ai", emoji: "🤖" }];
 

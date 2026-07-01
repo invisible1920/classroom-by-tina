@@ -2,9 +2,21 @@ import { CalendarDays, MapPin, Star } from "lucide-react";
 
 import { getNextMonthReleaseInfo } from "@/lib/month-access";
 
-export default function DashboardHeader({ name }: { name?: string }) {
+type DashboardHeaderProps = {
+  name?: string;
+  role?: string | null;
+  subscriptionStatus?: string | null;
+};
+
+export default function DashboardHeader({
+  name,
+  role,
+  subscriptionStatus,
+}: DashboardHeaderProps) {
   const firstName = name?.split(" ")[0] ?? "Teacher";
   const nextRelease = getNextMonthReleaseInfo();
+
+  const isPro = role === "admin" || subscriptionStatus === "pro";
 
   return (
     <section className="overflow-hidden rounded-[2rem] border border-[#ffe7b5] bg-white p-8 shadow-sm">
@@ -25,9 +37,15 @@ export default function DashboardHeader({ name }: { name?: string }) {
           </p>
         </div>
 
-        <div className="flex w-fit items-center gap-2 rounded-full bg-[#35c6c9]/10 px-4 py-2 text-sm font-black text-[#35c6c9]">
+        <div
+          className={`flex w-fit items-center gap-2 rounded-full px-4 py-2 text-sm font-black ${
+            isPro
+              ? "bg-[#35c6c9]/10 text-[#35c6c9]"
+              : "bg-[#fff3c4] text-[#d48806]"
+          }`}
+        >
           <Star size={16} fill="currentColor" />
-          Teacher Dashboard
+          {isPro ? "Pro Teacher" : "Free Account"}
         </div>
       </div>
 

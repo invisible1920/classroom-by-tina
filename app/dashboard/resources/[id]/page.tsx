@@ -84,10 +84,12 @@ export default async function ResourceDetailPage({
     .maybeSingle();
 
   if (!profile) {
-    redirect("/signup");
-  }
+  redirect("/signup");
+}
 
-  const resource = await getResource(id);
+const isPro = profile.role === "admin" || profile.subscription_status === "pro";
+
+const resource = await getResource(id);
 
   if (!resource || resource.status !== "published") {
     notFound();
@@ -163,7 +165,7 @@ export default async function ResourceDetailPage({
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-[#35c6c9] px-6 py-4 font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#2fb4b7]"
               >
                 <Download size={18} />
-                Download Resource
+{isPro ? "Download Resource" : "Subscribe to Download"}
               </button>
             </form>
           ) : (

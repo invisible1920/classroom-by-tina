@@ -3,10 +3,10 @@ import {
   BarChart3,
   FilePlus2,
   FileText,
-  Settings,
   Sparkles,
   Users,
   ArrowRight,
+  LifeBuoy,
 } from "lucide-react";
 
 import Card from "@/components/ui/Card";
@@ -34,6 +34,12 @@ const adminActions = [
     href: "/admin/teachers",
     icon: Users,
   },
+  {
+  title: "Support Requests",
+  description: "View teacher questions, resource requests, and problem reports.",
+  href: "/admin/support",
+  icon: LifeBuoy,
+},
   {
     title: "Analytics",
     description: "View resource performance and teacher engagement.",
